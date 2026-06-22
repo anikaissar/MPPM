@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKU Listing Portal — Nat Habit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0f0e;--surface:#161918;--surface2:#1e2220;--border:#2c3330;
+    --text:#e8ede9;--text-muted:#7a8c7e;--text-dim:#4a5c4e;
+    --green:#4caf7d;--green-dim:#1e3d2a;--green-glow:rgba(76,175,125,.15);
+    --amber:#f0a500;--amber-dim:#3d2e00;
+    --red:#e05c5c;--red-dim:#3d1a1a;
+    --blue:#5b9cf6;--blue-dim:#1a2a4a;
+    --purple:#a78bfa;--purple-dim:#2d1f4a;
+    --teal:#2dd4bf;--teal-dim:#0d2e2a;
+    --font-display:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(76,175,125,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(76,175,125,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+  .container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+  header{padding:32px 0 24px;border-bottom:1px solid var(--border);margin-bottom:40px}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .logo-block{display:flex;align-items:center;gap:16px}
+  .logo-mark{width:44px;height:44px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:18px;color:#0d0f0e;letter-spacing:-1px;flex-shrink:0}
+  .logo-text{font-family:var(--font-display)}
+  .logo-text h1{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+  .logo-text p{font-size:11px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+  .header-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:8px}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+  .nav-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:36px;width:fit-content;flex-wrap:wrap}
+  .tab-btn{padding:9px 20px;border-radius:8px;border:none;background:transparent;color:var(--text-muted);font-family:var(--font-mono);font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.3px;display:flex;align-items:center;gap:6px}
+  .tab-btn:hover{color:var(--text)}
+  .tab-btn.active{background:var(--green-dim);color:var(--green);border:1px solid rgba(76,175,125,.3)}
+  .tab-badge{background:var(--amber-dim);color:var(--amber);border-radius:10px;font-size:10px;padding:1px 6px;font-weight:600}
+
+  .panel{display:none}.panel.active{display:block}
+
+  /* form */
+  .form-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px}
+  .section-label{font-family:var(--font-display);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .form-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+  .form-grid.cols-1{grid-template-columns:1fr}
+  @media(max-width:700px){.form-grid,.form-grid.cols-3{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:7px}
+  label{font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;font-weight:500}
+  input[type=text],input[type=number],select{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;appearance:none}
+  input::placeholder{color:var(--text-dim)}
+  input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-glow)}
+  input.update-mode{border-color:var(--amber)!important;box-shadow:0 0 0 3px rgba(240,165,0,.12)!important;color:var(--amber)!important}
+  select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234caf7d' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+  select option{background:#161918}
+
+  /* NH SKU block */
+  .nh-sku-block{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px}
+  .nh-sku-section-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .nh-sku-section-title.parent{color:var(--teal)}
+  .nh-sku-section-title.child{color:var(--purple)}
+  .nh-sku-section-title .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+  .badge-parent{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(45,212,191,.2)}
+  .badge-child{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+  .nh-sku-hint{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:2px}
+  .child-sku-rows{display:flex;flex-direction:column;gap:8px}
+  .child-sku-row{display:flex;gap:8px;align-items:center}
+  .child-sku-row input{flex:1}
+  .plus-sep{font-size:16px;color:var(--purple);opacity:.7;font-weight:700;width:18px;text-align:center;flex-shrink:0}
+
+  .btn-icon{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;flex-shrink:0;font-family:var(--font-mono)}
+  .btn-icon.add-green{border-color:rgba(76,175,125,.3);color:var(--green)}.btn-icon.add-green:hover{background:var(--green-dim)}
+  .btn-icon.add-purple{border-color:rgba(167,139,250,.3);color:var(--purple)}.btn-icon.add-purple:hover{background:var(--purple-dim)}
+  .btn-icon.remove{border-color:rgba(224,92,92,.3);color:var(--red)}.btn-icon.remove:hover{background:var(--red-dim)}
+
+  .wh-group{display:flex;gap:12px;flex-wrap:wrap}
+  .wh-option{position:relative}
+  .wh-option input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+  .wh-option label{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;letter-spacing:1px;color:var(--text-muted);transition:all .2s;text-transform:none}
+  .wh-option input:checked+label{background:var(--green-dim);border-color:rgba(76,175,125,.4);color:var(--green)}
+  .wh-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.6}
+
+  .update-alert{display:none;background:var(--amber-dim);border:1px solid rgba(240,165,0,.35);border-radius:12px;padding:16px 20px;margin-bottom:20px;gap:14px;align-items:flex-start}
+  .update-alert.visible{display:flex}
+  .update-alert-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+  .update-alert-title{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--amber);margin-bottom:4px}
+  .update-alert-desc{font-size:12px;color:var(--text-muted);line-height:1.6}
+  .update-alert-desc strong{color:var(--amber)}
+
+  .field-changed label::after{content:' CHANGED';font-size:9px;letter-spacing:1px;color:var(--amber);margin-left:6px;background:var(--amber-dim);padding:1px 5px;border-radius:3px}
+  .field-changed input,.field-changed select{border-color:rgba(240,165,0,.5)!important}
+
+  .btn-submit{width:100%;padding:14px;background:var(--green);border:none;border-radius:10px;color:#0d0f0e;font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;margin-top:8px}
+  .btn-submit:hover{background:#5ec98f;transform:translateY(-1px);box-shadow:0 6px 24px rgba(76,175,125,.25)}
+  .btn-submit:active{transform:translateY(0)}
+  .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-submit.update-mode{background:var(--amber);color:#1a1200}
+  .btn-submit.update-mode:hover{background:#ffc029;box-shadow:0 6px 24px rgba(240,165,0,.25)}
+
+  /* listings */
+  .listings-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+  .listings-title{font-family:var(--font-display);font-size:18px;font-weight:700}
+  .listings-count{font-size:12px;color:var(--text-muted);background:var(--surface);border:1px solid var(--border);padding:5px 12px;border-radius:20px}
+  .btn-refresh{padding:9px 18px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-family:var(--font-mono);font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
+  .btn-refresh:hover{border-color:var(--green);color:var(--green)}
+
+  /* filter bar */
+  .filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .filter-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:13px;padding:8px 14px;outline:none;transition:border-color .2s;width:180px}
+  .filter-input:focus{border-color:var(--green)}
+  .filter-input::placeholder{color:var(--text-dim)}
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:13px;padding:8px 32px 8px 14px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8c7e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s}
+  .filter-select:focus{border-color:var(--green)}
+  .filter-select option{background:#161918}
+  .filter-clear{padding:8px 14px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-family:var(--font-mono);font-size:12px;cursor:pointer;transition:all .2s}
+  .filter-clear:hover{color:var(--red);border-color:rgba(224,92,92,.3)}
+
+  /* table */
+  .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;font-size:12px;min-width:1000px}
+  thead th{background:var(--surface2);padding:12px 14px;text-align:left;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:var(--surface2)}
+  tbody td{padding:11px 14px;color:var(--text);vertical-align:middle;white-space:nowrap}
+  .td-sku{font-weight:500;color:var(--green)}
+  .td-mono{color:var(--text-muted)}
+
+  .pill-parent{display:inline-block;background:var(--teal-dim);color:var(--teal);border:1px solid rgba(45,212,191,.2);border-radius:4px;padding:2px 8px;font-size:11px;margin:1px;font-weight:500}
+  .pill-child{display:inline-block;background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,.15);border-radius:4px;padding:2px 7px;font-size:10px;margin:1px}
+  .pill-sep{color:var(--purple);font-size:11px;font-weight:700;padding:0 2px}
+
+  .approval-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.5px;white-space:nowrap}
+  .badge-dot{width:6px;height:6px;border-radius:50%}
+  .approval-pending{background:var(--amber-dim);color:var(--amber)}.approval-pending .badge-dot{background:var(--amber)}
+  .approval-approved{background:var(--green-dim);color:var(--green)}.approval-approved .badge-dot{background:var(--green)}
+  .approval-rejected{background:var(--red-dim);color:var(--red)}.approval-rejected .badge-dot{background:var(--red)}
+  .version-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+  .wh-tag{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:10px;color:var(--text-muted);margin:1px}
+  .changed-chip{background:var(--amber-dim);color:var(--amber);border-radius:4px;padding:2px 6px;font-size:10px;margin:1px;display:inline-block}
+  .btn-edit{padding:4px 11px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .btn-edit:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+
+  .empty-state{text-align:center;padding:60px 20px;color:var(--text-dim)}
+  .empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.3}
+  .empty-state p{font-size:13px;line-height:1.6}
+  .loading-row td{text-align:center;padding:40px;color:var(--text-dim);font-size:13px}
+
+  .config-notice{background:var(--amber-dim);border:1px solid rgba(240,165,0,.3);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--amber);margin-bottom:24px;display:flex;align-items:flex-start;gap:10px;line-height:1.6}
+  .config-notice code{background:rgba(240,165,0,.15);padding:1px 6px;border-radius:4px;font-family:var(--font-mono);font-size:12px}
+
+  /* ── BULK UPLOAD ── */
+  .bulk-zone{border:2px dashed var(--border);border-radius:14px;padding:40px 24px;text-align:center;transition:all .2s;cursor:pointer;background:var(--bg);position:relative}
+  .bulk-zone:hover,.bulk-zone.drag-over{border-color:var(--green);background:var(--green-dim)}
+  .bulk-zone-icon{font-size:36px;margin-bottom:12px;opacity:.6}
+  .bulk-zone-title{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:6px}
+  .bulk-zone-sub{font-size:12px;color:var(--text-muted);line-height:1.6}
+  .bulk-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+
+  .bulk-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+  .btn-secondary{padding:10px 20px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-family:var(--font-mono);font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
+  .btn-secondary:hover{border-color:var(--green);color:var(--green)}
+  .btn-secondary.blue:hover{border-color:var(--blue);color:var(--blue)}
+
+  .bulk-preview{margin-top:24px}
+  .bulk-preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+  .bulk-preview-title{font-family:var(--font-display);font-size:15px;font-weight:700}
+  .bulk-stat{font-size:12px;padding:4px 12px;border-radius:20px}
+  .bulk-stat.ok{background:var(--green-dim);color:var(--green)}
+  .bulk-stat.warn{background:var(--amber-dim);color:var(--amber)}
+  .bulk-stat.err{background:var(--red-dim);color:var(--red)}
+
+  .bulk-row-ok{}
+  .bulk-row-warn td{background:rgba(240,165,0,.04)}
+  .bulk-row-err td{background:rgba(224,92,92,.05)}
+  .row-status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;white-space:nowrap}
+  .row-status-badge.new{background:var(--green-dim);color:var(--green)}
+  .row-status-badge.update{background:var(--amber-dim);color:var(--amber)}
+  .row-status-badge.error{background:var(--red-dim);color:var(--red)}
+
+  .bulk-submit-bar{display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap}
+  .btn-bulk-submit{padding:12px 28px;background:var(--green);border:none;border-radius:10px;color:#0d0f0e;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+  .btn-bulk-submit:hover{background:#5ec98f;transform:translateY(-1px)}
+  .btn-bulk-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-bulk-cancel{padding:12px 20px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text-muted);font-family:var(--font-mono);font-size:13px;cursor:pointer;transition:all .2s}
+  .btn-bulk-cancel:hover{border-color:var(--red);color:var(--red)}
+
+  .progress-bar-wrap{background:var(--surface2);border-radius:6px;height:6px;flex:1;min-width:120px;overflow:hidden}
+  .progress-bar{height:100%;background:var(--green);border-radius:6px;transition:width .3s;width:0%}
+
+  /* setup */
+  .setup-steps{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:28px}
+  .setup-steps h3{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:16px;color:var(--text)}
+  .step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+  .step-num{width:26px;height:26px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(76,175,125,.3);color:var(--green);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .step-content{font-size:13px;color:var(--text-muted);line-height:1.6}
+  .step-content strong{color:var(--text);font-weight:500}
+  .step-content code{background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:11px;color:var(--text);font-family:var(--font-mono)}
+  .script-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);line-height:1.7;overflow-x:auto;margin:10px 0;white-space:pre}
+  .copy-btn{padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:all .2s;float:right;margin-top:-4px}
+  .copy-btn:hover{color:var(--green);border-color:rgba(76,175,125,.3)}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.175,.885,.32,1.275);z-index:1000;max-width:380px}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-color:rgba(76,175,125,.4)}.toast.error{border-color:rgba(224,92,92,.4)}.toast.info{border-color:rgba(91,156,246,.4)}.toast.warn{border-color:rgba(240,165,0,.4)}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-inner">
+      <div class="logo-block">
+        <div class="logo-mark">NH</div>
+        <div class="logo-text">
+          <h1>SKU Listing Portal</h1>
+          <p>Nat Habit · Operations</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="header-status">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="connection-status">Connecting…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('submit',this)">+ New SKU</button>
+    <button class="tab-btn" onclick="switchTab('bulk',this)">⬆ Bulk Upload</button>
+    <button class="tab-btn" onclick="switchTab('listings',this)">Listings</button>
+    <button class="tab-btn" onclick="switchTab('history',this)">Change History <span class="tab-badge" id="history-badge" style="display:none">0</span></button>
+    <button class="tab-btn" onclick="switchTab('setup',this)">Setup Guide</button>
+  </div>
+
+  <!-- ═══════════════════════ NEW SKU PANEL ═══════════════════════ -->
+  <div id="panel-submit" class="panel active">
+    <div id="config-banner" class="config-notice" style="display:none">
+      ⚠️ <span>Google Sheets not configured. Set your Apps Script URL in <code>SCRIPT_URL</code>. See the <strong>Setup Guide</strong> tab.</span>
+    </div>
+
+    <div class="update-alert" id="update-alert">
+      <div class="update-alert-icon">🔄</div>
+      <div>
+        <div class="update-alert-title">Update Mode — Existing SKU Detected</div>
+        <div class="update-alert-desc" id="update-alert-desc"></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Platform Info</div>
+      <div class="form-grid">
+        <div class="field" id="field-platformSKU">
+          <label>Platform SKU Code</label>
+          <input type="text" id="platformSKU" placeholder="e.g. AMZ-FBA-001" autocomplete="off" oninput="onPlatformSKUInput(this.value)">
+        </div>
+        <div class="field" id="field-platformName">
+          <label>Platform Name</label>
+          <select id="platformName" onchange="trackChange('platformName')">
+            <option value="">Select platform…</option>
+            <option>Amazon</option><option>Nykaa</option><option>Flipkart</option>
+            <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
+            <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
+            <option>First Cry</option><option>Cred</option><option>Purplle</option>
+            <option>Tata Cliq</option><option>Jiomart</option><option>Amala Earth</option>
+            <option>Tata 1 Mg</option><option>Pharmeasy</option><option>Snapdeal</option>
+            <option>POP Club</option><option>Kind Life</option><option>First Club</option>
+            <option>Shopsy</option><option>Flipkart Minutes</option>
+          </select>
+        </div>
+        <div class="field" id="field-channelSKU">
+          <label>Channel SKU Code</label>
+          <input type="text" id="channelSKU" placeholder="e.g. CH-2024-NH-001" autocomplete="off" oninput="trackChange('channelSKU')">
+        </div>
+        <div class="field" id="field-status">
+          <label>Status</label>
+          <select id="status" onchange="trackChange('status')">
+            <option value="">Select status…</option>
+            <option>Active</option><option>Inactive</option><option>Upcoming</option><option>Discontinued</option>
+          </select>
+        </div>
+        <div class="field" id="field-barcode">
+          <label>Barcode <span style="font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:none">(optional)</span></label>
+          <input type="text" id="barcode" placeholder="e.g. 8901234567890" autocomplete="off" oninput="trackChange('barcode')">
+        </div>
+        <div class="field" id="field-grandParentCode">
+          <label>Grand Parent Code <span style="font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:none">(optional)</span></label>
+          <input type="text" id="grandParentCode" placeholder="e.g. GP-SHMP-001" autocomplete="off" oninput="trackChange('grandParentCode')">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Product Details</div>
+      <div class="form-grid cols-1" style="margin-bottom:18px">
+        <div class="field" id="field-nhSKUs">
+          <label>Nat Habit SKU Codes</label>
+          <div class="nh-sku-block">
+            <div>
+              <div class="nh-sku-section-title parent">
+                <span class="badge badge-parent">Parent</span>Primary mapping SKU
+              </div>
+              <div class="nh-sku-hint" style="margin-bottom:10px">The single NH SKU this platform listing maps to.</div>
+              <input type="text" id="parentSKU" placeholder="e.g. NH-SHMP-001" autocomplete="off" oninput="trackChange('parentSKU')">
+            </div>
+            <div>
+              <div class="nh-sku-section-title child">
+                <span class="badge badge-child">Child</span>Component SKUs — for combo products
+              </div>
+              <div class="nh-sku-hint" style="margin-bottom:10px">Leave empty if not a combo. Stored separated by +.</div>
+              <div class="child-sku-rows" id="child-sku-rows">
+                <div class="child-sku-row">
+                  <span class="plus-sep" style="opacity:0">+</span>
+                  <input type="text" placeholder="e.g. NH-COND-002 (optional)" autocomplete="off" oninput="trackChange('childSKUs')">
+                </div>
+              </div>
+              <div style="margin-top:8px">
+                <button class="btn-icon add-purple" onclick="addChildSKURow()" title="Add child SKU">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field" id="field-ean">
+          <label>EAN Code</label>
+          <input type="text" id="ean" placeholder="13-digit barcode" maxlength="13" autocomplete="off" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'');trackChange('ean')">
+        </div>
+        <div class="field" id="field-mrp">
+          <label>MRP (₹)</label>
+          <input type="number" id="mrp" placeholder="e.g. 299" min="0" step="0.01" oninput="trackChange('mrp')">
+        </div>
+        <div class="field" id="field-gst">
+          <label>GST (%)</label>
+          <select id="gst" onchange="trackChange('gst')">
+            <option value="">Select GST rate…</option>
+            <option>5%</option><option>18%</option>
+          </select>
+        </div>
+        <div class="field" id="field-shelfLife">
+          <label>Shelf Life</label>
+          <select id="shelfLife" onchange="trackChange('shelfLife')">
+            <option value="">Select shelf life…</option>
+            <option>1.5 months</option>
+            <option>2 months</option>
+            <option>3 months</option>
+            <option>6 months</option>
+            <option>9 months</option>
+            <option>12 months</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Operations</div>
+      <div class="form-grid cols-1" style="gap:20px">
+        <div class="field" id="field-warehouseMapping">
+          <label>Warehouse Mapping</label>
+          <div class="wh-group">
+            <div class="wh-option"><input type="checkbox" id="wh-ggn" value="GGN" onchange="trackChange('warehouseMapping')"><label for="wh-ggn"><span class="wh-dot"></span>GGN — Gurugram</label></div>
+            <div class="wh-option"><input type="checkbox" id="wh-blr" value="BLR" onchange="trackChange('warehouseMapping')"><label for="wh-blr"><span class="wh-dot"></span>BLR — Bangalore</label></div>
+            <div class="wh-option"><input type="checkbox" id="wh-mum" value="MUM" onchange="trackChange('warehouseMapping')"><label for="wh-mum"><span class="wh-dot"></span>MUM — Mumbai</label></div>
+          </div>
+        </div>
+        <div class="field" id="field-uploaderName" style="max-width:320px">
+          <label>Uploader</label>
+          <select id="uploaderName" onchange="trackChange('uploaderName')">
+            <option value="">Select your name…</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitSKU()">Submit SKU Listing</button>
+  </div>
+
+  <!-- ═══════════════════════ BULK UPLOAD PANEL ═══════════════════════ -->
+  <div id="panel-bulk" class="panel">
+
+    <div class="form-section">
+      <div class="section-label">Bulk Upload</div>
+
+      <div class="bulk-actions">
+        <button class="btn-secondary" onclick="downloadTemplate()">⬇ Download Excel Template</button>
+        <button class="btn-secondary blue" onclick="document.getElementById('bulk-file-input').click()">📂 Choose File (.xlsx / .csv)</button>
+        <input type="file" id="bulk-file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleBulkFile(this.files[0])">
+      </div>
+
+      <!-- Drop zone -->
+      <div class="bulk-zone" id="bulk-zone"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="event.preventDefault();this.classList.remove('drag-over');handleBulkFile(event.dataTransfer.files[0])">
+        <input type="file" accept=".xlsx,.xls,.csv" onchange="handleBulkFile(this.files[0])">
+        <div class="bulk-zone-icon">📊</div>
+        <div class="bulk-zone-title">Drop your Excel or CSV here</div>
+        <div class="bulk-zone-sub">
+          .xlsx, .xls, or .csv · drag &amp; drop or click to browse<br>
+          <span style="color:var(--text-dim)">Download the template above to get the correct format</span>
+        </div>
+      </div>
+
+      <!-- Format reference -->
+      <div style="margin-top:24px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Excel / CSV Column Format</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+          <div style="font-size:12px;line-height:2">
+            <span style="color:var(--green)">A</span> <span style="color:var(--text-muted)">Platform_SKU_Code</span><br>
+            <span style="color:var(--green)">B</span> <span style="color:var(--text-muted)">Parent_NH_SKU</span><br>
+            <span style="color:var(--green)">C</span> <span style="color:var(--text-muted)">Child_Codes <span style="color:var(--text-dim)">(use + separator)</span></span><br>
+            <span style="color:var(--green)">D</span> <span style="color:var(--text-muted)">GST <span style="color:var(--text-dim)">(5% or 18%)</span></span><br>
+            <span style="color:var(--green)">E</span> <span style="color:var(--text-muted)">EAN <span style="color:var(--text-dim)">(13 digits, numbers only)</span></span>
+          </div>
+          <div style="font-size:12px;line-height:2">
+            <span style="color:var(--green)">F</span> <span style="color:var(--text-muted)">MRP</span><br>
+            <span style="color:var(--green)">G</span> <span style="color:var(--text-muted)">Platform_Name</span><br>
+            <span style="color:var(--green)">H</span> <span style="color:var(--text-muted)">Channel_SKU_Code</span><br>
+            <span style="color:var(--green)">I</span> <span style="color:var(--text-muted)">Shelf_Life <span style="color:var(--text-dim)">(1.5 months / 2 months / 3 months / 6 months / 9 months / 12 months)</span></span><br>
+            <span style="color:var(--green)">J</span> <span style="color:var(--text-muted)">Status <span style="color:var(--text-dim)">(Active / Inactive / Upcoming / Discontinued)</span></span>
+          </div>
+          <div style="font-size:12px;line-height:2">
+            <span style="color:var(--green)">K</span> <span style="color:var(--text-muted)">Warehouses <span style="color:var(--text-dim)">(GGN, BLR, MUM — comma separated)</span></span><br>
+            <span style="color:var(--green)">L</span> <span style="color:var(--text-muted)">Uploader <span style="color:var(--text-dim)">(exact name from list)</span></span><br>
+            <span style="color:var(--green)">M</span> <span style="color:var(--text-muted)">Barcode <span style="color:var(--text-dim)">(optional)</span></span><br>
+            <span style="color:var(--green)">N</span> <span style="color:var(--text-muted)">Grand_Parent_Code <span style="color:var(--text-dim)">(optional)</span></span>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);line-height:1.8">
+          <strong style="color:var(--amber)">Child_Codes example:</strong> For a combo of 2 SKUs write <code style="background:var(--surface2);padding:1px 6px;border-radius:3px;font-size:11px">NH-SHMP-001+NH-COND-002</code> — no spaces around the +<br>
+          <strong style="color:var(--amber)">Warehouses example:</strong> <code style="background:var(--surface2);padding:1px 6px;border-radius:3px;font-size:11px">GGN, MUM</code> or <code style="background:var(--surface2);padding:1px 6px;border-radius:3px;font-size:11px">GGN, BLR, MUM</code> for all three<br>
+          <strong style="color:var(--amber)">Existing SKUs:</strong> If a Platform SKU already exists in the sheet it will be updated and the old version archived automatically — same as single entry.<br>
+          <strong style="color:var(--amber)">Excel (.xlsx):</strong> Upload directly — no need to save as CSV. First sheet / first tab is used.
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview area (shown after file load) -->
+    <div id="bulk-preview" class="bulk-preview" style="display:none">
+      <div class="bulk-preview-header">
+        <div class="bulk-preview-title">Preview — <span id="preview-filename"></span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="bulk-stat ok" id="bulk-stat-new">0 new</span>
+          <span class="bulk-stat warn" id="bulk-stat-update">0 updates</span>
+          <span class="bulk-stat err" id="bulk-stat-error">0 errors</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Status</th><th>Platform SKU</th><th>Parent NH SKU</th><th>Child Codes</th>
+              <th>Platform</th><th>MRP</th><th>GST</th><th>EAN</th><th>Shelf Life</th>
+              <th>Prod Status</th><th>Warehouses</th><th>Uploader</th><th>Issue</th>
+            </tr>
+          </thead>
+          <tbody id="bulk-preview-body"></tbody>
+        </table>
+      </div>
+      <div class="bulk-submit-bar">
+        <button class="btn-bulk-submit" id="bulk-submit-btn" onclick="submitBulk()">Submit Valid Rows</button>
+        <button class="btn-bulk-cancel" onclick="clearBulk()">✕ Clear</button>
+        <div class="progress-bar-wrap" id="bulk-progress-wrap" style="display:none">
+          <div class="progress-bar" id="bulk-progress-bar"></div>
+        </div>
+        <span id="bulk-progress-label" style="font-size:12px;color:var(--text-muted)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ LISTINGS PANEL ═══════════════════════ -->
+  <div id="panel-listings" class="panel">
+    <div class="listings-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="listings-title">Active Listings</div>
+        <div class="listings-count" id="listings-count">— entries</div>
+      </div>
+      <button class="btn-refresh" onclick="fetchListings()"><span id="refresh-icon">↺</span> Refresh</button>
+    </div>
+    <div class="filter-bar">
+      <select class="filter-select" id="filter-uploader" onchange="applyListingFilters()">
+        <option value="">All uploaders</option>
+      </select>
+      <select class="filter-select" id="filter-platform" onchange="applyListingFilters()">
+        <option value="">All platforms</option>
+        <option>Amazon</option><option>Nykaa</option><option>Flipkart</option>
+        <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
+        <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
+        <option>First Cry</option><option>Cred</option><option>Purplle</option>
+        <option>Tata Cliq</option><option>Jiomart</option><option>Amala Earth</option>
+        <option>Tata 1 Mg</option><option>Pharmeasy</option><option>Snapdeal</option>
+        <option>POP Club</option><option>Kind Life</option><option>First Club</option>
+        <option>Shopsy</option><option>Flipkart Minutes</option>
+      </select>
+      <select class="filter-select" id="filter-approval" onchange="applyListingFilters()">
+        <option value="">All approvals</option>
+        <option>Pending</option><option>Approved</option><option>Rejected</option>
+      </select>
+      <button class="filter-clear" onclick="clearListingFilters()">✕ Clear</button>
+      <div class="listings-count" id="filter-count" style="display:none"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Platform SKU</th><th>Parent NH SKU</th><th>Child Codes</th><th>Platform</th>
+          <th>Channel SKU</th><th>MRP</th><th>GST</th><th>EAN</th><th>Shelf Life</th>
+          <th>Status</th><th>Warehouses</th><th>Uploader</th><th>Last Updated</th>
+          <th>Ver</th><th>Approval</th><th>Action</th>
+        </tr></thead>
+        <tbody id="listings-body">
+          <tr class="loading-row"><td colspan="16">Click Refresh to load listings</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ HISTORY PANEL ═══════════════════════ -->
+  <div id="panel-history" class="panel">
+    <div class="listings-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="listings-title">Change History</div>
+        <div class="listings-count" id="history-count">— entries</div>
+      </div>
+      <button class="btn-refresh" onclick="fetchHistory()"><span id="history-refresh-icon">↺</span> Refresh</button>
+    </div>
+    <div class="filter-bar">
+      <input type="text" class="filter-input" id="history-filter-sku" placeholder="Filter by Platform SKU…" oninput="applyHistoryFilters()">
+      <select class="filter-select" id="history-filter-uploader" onchange="applyHistoryFilters()">
+        <option value="">All uploaders</option>
+      </select>
+      <select class="filter-select" id="history-filter-platform" onchange="applyHistoryFilters()">
+        <option value="">All platforms</option>
+        <option>Amazon</option><option>Nykaa</option><option>Flipkart</option>
+        <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
+        <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
+        <option>First Cry</option><option>Cred</option><option>Purplle</option>
+        <option>Tata Cliq</option><option>Jiomart</option><option>Amala Earth</option>
+        <option>Tata 1 Mg</option><option>Pharmeasy</option><option>Snapdeal</option>
+        <option>POP Club</option><option>Kind Life</option><option>First Club</option>
+        <option>Shopsy</option><option>Flipkart Minutes</option>
+      </select>
+      <button class="filter-clear" onclick="clearHistoryFilters()">✕ Clear</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Platform SKU</th><th>Ver</th><th>Parent NH SKU</th><th>Child Codes</th>
+          <th>Platform</th><th>MRP</th><th>GST</th><th>EAN</th><th>Status</th>
+          <th>Warehouses</th><th>Approval at Archive</th><th>Uploader</th>
+          <th>Originally Submitted</th><th>Archived On</th><th>Changed Fields</th>
+        </tr></thead>
+        <tbody id="history-body">
+          <tr class="loading-row"><td colspan="15">Click Refresh to load history</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SETUP PANEL ═══════════════════════ -->
+  <div id="panel-setup" class="panel">
+    <div class="setup-steps">
+      <h3>🚀 Setup Guide</h3>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Create four sheet tabs:</strong><br>
+          • <code>SKU Listings</code> — 18 cols: <code>Timestamp | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | Warehouses | Approval | Row ID | Version | Barcode | Grand Parent Code</code><br>
+          • <code>SKU History</code> — 20 cols: <code>Archived At | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | Warehouses | Approval | Row ID | Version | Original Timestamp | Changed Fields | Barcode | Grand Parent Code</code><br>
+          • <code>Uploaders</code> — 1 col: <code>Name</code> in A1, then one name per row from A2. Pre-filled with your 10 names. Add more anytime — they appear in the portal on next load.<br>
+          • <code>Bulk Upload Log</code> — optional, for tracking bulk job history (script auto-creates entries).<br><br>
+          <strong>Uploaders tab — initial data (paste into A1:A11):</strong><br>
+          <code>Name</code><br><code>Atul</code><br><code>Kush</code><br><code>Harsh</code><br><code>Manav</code><br><code>Garima</code><br><code>Aditya</code><br><code>Mayank</code><br><code>Anika</code><br><code>Daksh</code><br><code>Shtaakshi</code>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Apps Script:</strong> <code>Extensions → Apps Script</code>, paste the script, save.
+          <button class="copy-btn" onclick="copyScript()">Copy Script</button>
+          <div class="script-box" id="script-box">const MAIN_SHEET    = "SKU Listings";
+const HIST_SHEET    = "SKU History";
+const UPLDR_SHEET   = "Uploaders";
+const BULKLOG_SHEET = "Bulk Upload Log";
+
+// SKU Listings headers (18 cols)
+const MAIN_HEADERS = [
+  "Timestamp","Platform SKU","Parent NH SKU","Child Codes","GST","EAN","MRP",
+  "Platform Name","Channel SKU","Shelf Life","Status","Uploader","Warehouses",
+  "Approval","Row ID","Version","Barcode","Grand Parent Code"
+];
+// SKU History headers (20 cols)
+const HIST_HEADERS = [
+  "Archived At","Platform SKU","Parent NH SKU","Child Codes","GST","EAN","MRP",
+  "Platform Name","Channel SKU","Shelf Life","Status","Uploader","Warehouses",
+  "Approval","Row ID","Version","Original Timestamp","Changed Fields",
+  "Barcode","Grand Parent Code"
+];
+
+/* ── CORS-safe response ── */
+function cors(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doOptions(e) {
+  return ContentService.createTextOutput("").setMimeType(ContentService.MimeType.TEXT);
+}
+function doGet(e)  { return handleRequest(e); }
+function doPost(e) { return handleRequest(e); }
+
+function handleRequest(e) {
+  const body   = e.postData ? JSON.parse(e.postData.contents) : {};
+  const action = e.parameter.action || body.action;
+  try {
+    if (action === "getUploaders") return cors(getUploaders());
+    if (action === "check")        return cors(checkSKU(e.parameter.platformSKU || body.platformSKU));
+    if (action === "fetch")        return cors(fetchSKUs());
+    if (action === "fetchHistory") return cors(fetchHistory());
+    if (action === "submit")       return cors(upsertSKU(body, getSheet(MAIN_SHEET), getSheet(HIST_SHEET)));
+    if (action === "bulkSubmit")   return cors(bulkSubmit(body));
+    return cors({ success: false, error: "Unknown action: " + action });
+  } catch(err) {
+    return cors({ success: false, error: err.toString() });
+  }
+}
+
+/* ── get or create sheet, auto-write headers if empty ── */
+function getSheet(name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(name);
+  if (!sheet) sheet = ss.insertSheet(name);
+  if (sheet.getLastRow() === 0) {
+    const headers = name === MAIN_SHEET ? MAIN_HEADERS
+                  : name === HIST_SHEET ? HIST_HEADERS
+                  : null;
+    if (headers) sheet.appendRow(headers);
+  }
+  return sheet;
+}
+
+/* ── uploaders ── */
+function getUploaders() {
+  const rows = getSheet(UPLDR_SHEET).getDataRange().getValues();
+  const names = rows.slice(1).map(r => String(r[0]).trim()).filter(Boolean);
+  return { success: true, uploaders: names };
+}
+
+/* ── check if platform SKU exists ── */
+function checkSKU(platformSKU) {
+  const rows = getSheet(MAIN_SHEET).getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][1]).trim() === String(platformSKU).trim()) {
+      return { success: true, exists: true, version: rows[i][15] || 1, current: rowToObj(rows[i]) };
+    }
+  }
+  return { success: true, exists: false };
+}
+
+function rowToObj(r) {
+  return {
+    timestamp: r[0], platformSKU: r[1], parentSKU: r[2], childCodes: r[3],
+    gst: r[4], ean: r[5], mrp: r[6], platformName: r[7], channelSKU: r[8],
+    shelfLife: r[9], status: r[10], uploaderName: r[11], warehouseMapping: r[12],
+    approval: r[13], rowId: r[14], version: r[15] || 1,
+    barcode: r[16] || "", grandParentCode: r[17] || ""
+  };
+}
+
+/* ── upsert (new or update) ── */
+// Accepts optional pre-loaded sheet data for bulk mode (avoids re-reading sheet per row)
+function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
+  const now      = new Date().toISOString();
+  const childStr = Array.isArray(data.childCodes) ? data.childCodes.join("+") : (data.childCodes || "");
+  const wh       = Array.isArray(data.warehouseMapping) ? data.warehouseMapping.join(", ") : (data.warehouseMapping || "");
+  const barcode  = data.barcode || "";
+  const gpc      = data.grandParentCode || "";
+
+  // Use cached rows in bulk mode, otherwise read from sheet
+  const rows  = _cachedRows || mainSheet.getDataRange().getValues();
+  const idx   = _rowIndex !== undefined ? _rowIndex : (() => {
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][1]).trim() === String(data.platformSKU).trim()) return i;
+    }
+    return -1;
+  })();
+
+  if (idx !== -1) {
+    const old        = rows[idx];
+    const oldVersion = Number(old[15]) || 1;
+    const fieldMap   = {
+      "Parent NH SKU":    [old[2],  data.parentSKU],
+      "Child Codes":      [old[3],  childStr],
+      "GST":              [old[4],  data.gst],
+      "EAN":              [old[5],  data.ean],
+      "MRP":              [old[6],  data.mrp],
+      "Platform Name":    [old[7],  data.platformName],
+      "Channel SKU":      [old[8],  data.channelSKU],
+      "Shelf Life":       [old[9],  data.shelfLife],
+      "Status":           [old[10], data.status],
+      "Uploader":         [old[11], data.uploaderName],
+      "Warehouses":       [old[12], wh],
+      "Barcode":          [old[16] || "", barcode],
+      "Grand Parent Code":[old[17] || "", gpc]
+    };
+    const changed = Object.entries(fieldMap)
+      .filter(([,[o,n]]) => String(o).trim() !== String(n).trim())
+      .map(([k]) => k);
+
+    histSheet.appendRow([
+      now, old[1], old[2], old[3], old[4], old[5], old[6],
+      old[7], old[8], old[9], old[10], old[11], old[12],
+      old[13], old[14], oldVersion, old[0], changed.join(", "),
+      old[16] || "", old[17] || ""
+    ]);
+
+    const newRow = [
+      now, data.platformSKU, data.parentSKU, childStr,
+      data.gst, data.ean, data.mrp, data.platformName,
+      data.channelSKU, data.shelfLife, data.status,
+      data.uploaderName, wh, "Pending", old[14], oldVersion + 1,
+      barcode, gpc
+    ];
+    mainSheet.getRange(idx + 1, 1, 1, 18).setValues([newRow]);
+    // Keep cache in sync
+    if (_cachedRows) rows[idx] = newRow;
+    return { success: true, type: "updated", version: oldVersion + 1, changedFields: changed };
+  }
+
+  const rowId  = Utilities.getUuid();
+  const newRow = [
+    now, data.platformSKU, data.parentSKU, childStr,
+    data.gst, data.ean, data.mrp, data.platformName,
+    data.channelSKU, data.shelfLife, data.status,
+    data.uploaderName, wh, "Pending", rowId, 1,
+    barcode, gpc
+  ];
+  mainSheet.appendRow(newRow);
+  // Keep cache in sync for later rows in the same batch
+  if (_cachedRows) _cachedRows.push(newRow);
+  return { success: true, type: "created", version: 1 };
+}
+
+/* ── bulk submit — reads sheet ONCE, processes all rows, writes in one pass ── */
+function bulkSubmit(body) {
+  const mainSheet = getSheet(MAIN_SHEET);
+  const histSheet = getSheet(HIST_SHEET);
+
+  // Build an in-memory index: platformSKU → rowIndex (1-based data index)
+  const allRows   = mainSheet.getDataRange().getValues();
+  const skuIndex  = {};
+  for (let i = 1; i < allRows.length; i++) {
+    skuIndex[String(allRows[i][1]).trim()] = i;
+  }
+
+  const results = [];
+  for (const row of (body.rows || [])) {
+    try {
+      const key = String(row.platformSKU).trim();
+      const idx = skuIndex.hasOwnProperty(key) ? skuIndex[key] : -1;
+      const r   = upsertSKU(row, mainSheet, histSheet, allRows, idx);
+      // If newly created, its row is now at the end — update index for potential duplicates in same batch
+      if (r.type === "created") {
+        skuIndex[key] = allRows.length - 1;
+      }
+      results.push({ platformSKU: row.platformSKU, ...r });
+    } catch(e) {
+      results.push({ platformSKU: row.platformSKU, success: false, error: e.toString() });
+    }
+  }
+
+  try {
+    const logSheet = getSheet(BULKLOG_SHEET);
+    if (logSheet.getLastRow() === 0)
+      logSheet.appendRow(["Timestamp","Submitted By","Total","Created","Updated","Errors"]);
+    logSheet.appendRow([
+      new Date().toISOString(), body.submittedBy || "",
+      results.length,
+      results.filter(r => r.type === "created").length,
+      results.filter(r => r.type === "updated").length,
+      results.filter(r => !r.success).length
+    ]);
+  } catch(e) {}
+  return { success: true, results };
+}
+
+/* ── fetch listings ── */
+function fetchSKUs() {
+  const rows = getSheet(MAIN_SHEET).getDataRange().getValues();
+  return { success: true, data: rows.slice(1).map(rowToObj) };
+}
+
+/* ── fetch history ── */
+function fetchHistory() {
+  const rows = getSheet(HIST_SHEET).getDataRange().getValues();
+  return {
+    success: true,
+    data: rows.slice(1).map(r => ({
+      archivedAt: r[0], platformSKU: r[1], parentSKU: r[2], childCodes: r[3],
+      gst: r[4], ean: r[5], mrp: r[6], platformName: r[7], channelSKU: r[8],
+      shelfLife: r[9], status: r[10], uploaderName: r[11], warehouseMapping: r[12],
+      approval: r[13], rowId: r[14], version: r[15] || 1,
+      originalTimestamp: r[16], changedFields: r[17],
+      barcode: r[18] || "", grandParentCode: r[19] || ""
+    }))
+  };
+}</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Deploy:</strong> <code>Deploy → New Deployment</code> → Type: <code>Web App</code> → Execute as: <code>Me</code> → Access: <code>Anyone in your org</code>. Copy the URL.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Paste URL:</strong> Open this HTML file in a text editor, find <code>const SCRIPT_URL = ""</code> and paste your URL. Save and reopen.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <strong>Managing uploaders:</strong> Simply add or remove names in the <code>Uploaders</code> sheet tab (column A, one name per row, starting from A2). Changes reflect in the portal on next page load — no code changes needed.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <strong>Hosting on GitHub Pages (free, replaces Netlify):</strong><br>
+          1. Create a new GitHub repository (public or private with Pages enabled).<br>
+          2. Name the file <code>index.html</code> and push it to the repo's <code>main</code> branch.<br>
+          3. Go to <strong>Settings → Pages</strong>, set Source to <code>Deploy from a branch</code>, branch: <code>main</code>, folder: <code>/ (root)</code>. Click <strong>Save</strong>.<br>
+          4. GitHub will publish your site at <code>https://&lt;username&gt;.github.io/&lt;repo-name&gt;/</code> within ~60 seconds.<br>
+          5. To update the portal later: edit <code>index.html</code> locally, commit, and push — GitHub Pages redeploys automatically.<br><br>
+          <strong>Tip:</strong> If you want a custom domain, add a <code>CNAME</code> file to the repo root with your domain name and configure your DNS provider to point to GitHub Pages.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon"></span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+  // ─── CONFIG ───────────────────────────────────────────────────────────────
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1C7KGREi9nL0RC_g-A0dnbltXeaXpk483imHwXzjzW4r0dOUAlYvBHi8ARivmRo2T/exec";
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /* ── unified fetch helper — sends as text/plain to avoid CORS preflight ── */
+  async function gs(params) {
+    const isWrite = params.action === 'submit' || params.action === 'bulkSubmit';
+    if (isWrite) {
+      // POST with text/plain — no preflight triggered
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'text/plain' }
+      });
+      return res.json();
+    } else {
+      // GET with query params
+      const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+      const res = await fetch(`${SCRIPT_URL}?${qs}`);
+      return res.json();
+    }
+  }
+
+  // Valid options for bulk validation
+  const VALID_GST        = ["5%","18%"];
+  const VALID_SHELF_LIFE = ["1.5 months","2 months","3 months","6 months","9 months","12 months"];
+  const VALID_PLATFORMS = ["Amazon","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jiomart","Amala Earth","Tata 1 Mg","Pharmeasy","Snapdeal","POP Club","Kind Life","First Club","Shopsy","Flipkart Minutes"];
+  const VALID_STATUS    = ["Active","Inactive","Upcoming","Discontinued"];
+  const VALID_WH        = ["GGN","BLR","MUM"];
+
+  let isUpdateMode = false, existingRecord = null, checkTimeout = null;
+  let allListingsData = [], allHistoryData = [];
+  let bulkRows = [], existingSKUs = new Set();
+  let uploadersList = [];
+
+  /* ── init ── */
+  window.addEventListener('DOMContentLoaded', async () => {
+    const ok = !!SCRIPT_URL;
+    document.getElementById('config-banner').style.display = ok ? 'none' : 'flex';
+    document.getElementById('connection-status').textContent = ok ? 'Connected' : 'Not configured';
+    if (ok) await loadUploaders();
+  });
+
+  async function loadUploaders() {
+    try {
+      const r = await gs({ action: 'getUploaders' });
+      if (r.success) {
+        uploadersList = r.uploaders;
+        populateUploaderDropdowns(r.uploaders);
+      }
+    } catch(e) {
+      // fallback to hardcoded list if sheet unreachable
+      const fallback = ["Atul","Kush","Harsh","Manav","Garima","Aditya","Mayank","Anika","Daksh","Shtaakshi"];
+      uploadersList = fallback;
+      populateUploaderDropdowns(fallback);
+    }
+  }
+
+  function populateUploaderDropdowns(names) {
+    const opts = names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    // Form dropdown
+    const formSel = document.getElementById('uploaderName');
+    formSel.innerHTML = '<option value="">Select your name…</option>' + opts;
+    // Listings filter
+    const listSel = document.getElementById('filter-uploader');
+    listSel.innerHTML = '<option value="">All uploaders</option>' + opts;
+    // History filter
+    const histSel = document.getElementById('history-filter-uploader');
+    histSel.innerHTML = '<option value="">All uploaders</option>' + opts;
+  }
+
+  /* ── tabs ── */
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    btn.classList.add('active');
+    if (tab === 'listings') fetchListings();
+    if (tab === 'history')  fetchHistory();
+  }
+
+  /* ══════════════ PLATFORM SKU CHECK ══════════════ */
+  function onPlatformSKUInput(val) {
+    clearTimeout(checkTimeout);
+    clearUpdateMode();
+    if (!val.trim() || !SCRIPT_URL) return;
+    checkTimeout = setTimeout(() => checkExistingSKU(val.trim()), 600);
+  }
+
+  async function checkExistingSKU(sku) {
+    try {
+      const r = await gs({ action: 'check', platformSKU: sku });
+      if (r.success && r.exists) enterUpdateMode(r.current, r.version);
+    } catch(e) {}
+  }
+
+  function enterUpdateMode(record, version) {
+    isUpdateMode = true; existingRecord = record;
+    document.getElementById('platformSKU').classList.add('update-mode');
+    document.getElementById('update-alert').classList.add('visible');
+    document.getElementById('update-alert-desc').innerHTML =
+      `Existing listing found — currently at <strong>v${version}</strong>, last uploaded by <strong>${esc(record.uploaderName)}</strong>. ` +
+      `Submitting will archive v${version} to <strong>SKU History</strong> and create <strong>v${version+1}</strong>. Approval resets to <strong>Pending</strong>.`;
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = `Update SKU (v${version} → v${version+1})`;
+    btn.classList.add('update-mode');
+    prefillForm(record);
+  }
+
+  function prefillForm(r) {
+    document.getElementById('platformName').value = r.platformName || '';
+    document.getElementById('channelSKU').value   = r.channelSKU || '';
+    document.getElementById('status').value        = r.status || '';
+    document.getElementById('ean').value           = r.ean || '';
+    document.getElementById('mrp').value           = r.mrp || '';
+    document.getElementById('gst').value           = r.gst || '';
+    document.getElementById('shelfLife').value     = r.shelfLife || '';
+    document.getElementById('uploaderName').value  = r.uploaderName || '';
+    document.getElementById('parentSKU').value     = r.parentSKU || '';
+    document.getElementById('barcode').value       = r.barcode || '';
+    document.getElementById('grandParentCode').value = r.grandParentCode || '';
+    const kids = (r.childCodes||'').split('+').map(s=>s.trim()).filter(Boolean);
+    const cc = document.getElementById('child-sku-rows');
+    cc.innerHTML = '';
+    if (kids.length) {
+      kids.forEach((k,i) => {
+        const row = document.createElement('div');
+        row.className = 'child-sku-row';
+        row.innerHTML = `
+          ${i>0?'<span class="plus-sep">+</span>':'<span class="plus-sep" style="opacity:0">+</span>'}
+          <input type="text" value="${esc(k)}" autocomplete="off" oninput="trackChange('childSKUs')">
+          ${i>0?'<button class="btn-icon remove" onclick="removeChildRow(this)">×</button>':''}`;
+        cc.appendChild(row);
+      });
+    } else {
+      cc.innerHTML = `<div class="child-sku-row"><span class="plus-sep" style="opacity:0">+</span><input type="text" placeholder="e.g. NH-COND-002 (optional)" autocomplete="off" oninput="trackChange('childSKUs')"></div>`;
+    }
+    ['GGN','BLR','MUM'].forEach(w => {
+      document.getElementById('wh-'+w.toLowerCase()).checked = (r.warehouseMapping||'').includes(w);
+    });
+    document.querySelectorAll('.field-changed').forEach(f=>f.classList.remove('field-changed'));
+  }
+
+  function clearUpdateMode() {
+    isUpdateMode = false; existingRecord = null;
+    document.getElementById('platformSKU').classList.remove('update-mode');
+    document.getElementById('update-alert').classList.remove('visible');
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = 'Submit SKU Listing';
+    btn.classList.remove('update-mode');
+    document.querySelectorAll('.field-changed').forEach(f=>f.classList.remove('field-changed'));
+  }
+
+  function trackChange(fieldId) {
+    if (!isUpdateMode || !existingRecord) return;
+    const fe = document.getElementById('field-'+fieldId) || document.getElementById('field-nhSKUs');
+    if (!fe) return;
+    let cur='',orig='';
+    if (fieldId==='childSKUs') { cur=getChildSKUs().join('+'); orig=(existingRecord.childCodes||'').trim(); }
+    else if (fieldId==='parentSKU') {
+      cur=document.getElementById('parentSKU').value.trim();
+      orig=(existingRecord.parentSKU||'').trim();
+      const b=document.getElementById('field-nhSKUs');
+      if(b){cur!==orig?b.classList.add('field-changed'):b.classList.remove('field-changed')}
+      return;
+    } else if (fieldId==='warehouseMapping') { cur=getWarehouses().join(', '); orig=(existingRecord.warehouseMapping||'').trim(); }
+    else { const el=document.getElementById(fieldId); if(el)cur=el.value; const m={platformName:'platformName',channelSKU:'channelSKU',status:'status',ean:'ean',mrp:'mrp',gst:'gst',shelfLife:'shelfLife',uploaderName:'uploaderName',barcode:'barcode',grandParentCode:'grandParentCode'}; if(m[fieldId])orig=String(existingRecord[m[fieldId]]||'').trim(); }
+    cur.trim()!==orig?fe.classList.add('field-changed'):fe.classList.remove('field-changed');
+  }
+
+  /* ── child SKU rows ── */
+  function addChildSKURow() {
+    const c=document.getElementById('child-sku-rows');
+    const row=document.createElement('div');
+    row.className='child-sku-row';
+    row.innerHTML=`<span class="plus-sep">+</span><input type="text" placeholder="e.g. NH-COND-002" autocomplete="off" oninput="trackChange('childSKUs')"><button class="btn-icon remove" onclick="removeChildRow(this)">×</button>`;
+    c.appendChild(row);row.querySelector('input').focus();
+  }
+  function removeChildRow(btn){const c=document.getElementById('child-sku-rows');if(c.querySelectorAll('.child-sku-row').length>1){btn.closest('.child-sku-row').remove();trackChange('childSKUs');}}
+  function getChildSKUs(){return Array.from(document.querySelectorAll('#child-sku-rows .child-sku-row input')).map(i=>i.value.trim()).filter(Boolean);}
+  function getWarehouses(){return['GGN','BLR','MUM'].filter(w=>document.getElementById('wh-'+w.toLowerCase()).checked);}
+
+  /* ── validation ── */
+  function validate() {
+    if (!document.getElementById('platformSKU').value.trim()) return 'Platform SKU Code is required';
+    if (!document.getElementById('parentSKU').value.trim())   return 'Parent NH SKU is required';
+    if (!document.getElementById('gst').value)                return 'Please select a GST rate';
+    const ean=document.getElementById('ean').value.trim();
+    if (!ean)              return 'EAN Code is required';
+    if (!/^\d{13}$/.test(ean)) return 'EAN must be exactly 13 digits (numbers only)';
+    if (!document.getElementById('mrp').value)                return 'MRP is required';
+    if (!document.getElementById('platformName').value)        return 'Platform Name is required';
+    if (!document.getElementById('channelSKU').value.trim())  return 'Channel SKU Code is required';
+    if (!document.getElementById('shelfLife').value)    return 'Please select a Shelf Life';
+    if (!document.getElementById('status').value)             return 'Status is required';
+    if (!getWarehouses().length)                              return 'Select at least one Warehouse';
+    if (!document.getElementById('uploaderName').value)       return 'Please select your name';
+    return null;
+  }
+
+  /* ── single submit ── */
+  async function submitSKU() {
+    const err=validate();
+    if(err){showToast(err,'error');return;}
+    if(!SCRIPT_URL){showToast('Apps Script URL not configured.','error');return;}
+    const payload={action:'submit',platformSKU:document.getElementById('platformSKU').value.trim(),parentSKU:document.getElementById('parentSKU').value.trim(),childCodes:getChildSKUs(),gst:document.getElementById('gst').value,ean:document.getElementById('ean').value.trim(),mrp:document.getElementById('mrp').value,platformName:document.getElementById('platformName').value,channelSKU:document.getElementById('channelSKU').value.trim(),shelfLife:document.getElementById('shelfLife').value.trim(),status:document.getElementById('status').value,uploaderName:document.getElementById('uploaderName').value,warehouseMapping:getWarehouses(),barcode:document.getElementById('barcode').value.trim(),grandParentCode:document.getElementById('grandParentCode').value.trim()};
+    const btn=document.getElementById('submit-btn');
+    btn.disabled=true;btn.textContent=isUpdateMode?'Updating…':'Submitting…';
+    try {
+      const r=await gs(payload);
+      if(r.success){
+        if(r.type==='updated'){const f=r.changedFields&&r.changedFields.length?` Changed: ${r.changedFields.join(', ')}.`:'';showToast(`Updated to v${r.version}.${f} Old version archived.`,'info');bumpHistoryBadge();}
+        else{showToast('New SKU created successfully!','success');}
+        resetForm();
+      } else throw new Error(r.error||'Unknown error');
+    } catch(e){showToast('Submission failed: '+e.message,'error');}
+    finally{btn.disabled=false;btn.textContent='Submit SKU Listing';btn.classList.remove('update-mode');}
+  }
+
+  function bumpHistoryBadge(){const b=document.getElementById('history-badge');b.style.display='inline';b.textContent=Number(b.textContent||0)+1;}
+
+  function editSKU(platformSKU){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('panel-submit').classList.add('active');
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('platformSKU').value=platformSKU;
+    checkExistingSKU(platformSKU);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function resetForm(){
+    clearUpdateMode();
+    ['platformSKU','ean','mrp','channelSKU','parentSKU','barcode','grandParentCode'].forEach(id=>{document.getElementById(id).value='';});
+    ['gst','platformName','status','uploaderName','shelfLife'].forEach(id=>{document.getElementById(id).selectedIndex=0;});
+    ['wh-ggn','wh-blr','wh-mum'].forEach(id=>{document.getElementById(id).checked=false;});
+    document.getElementById('child-sku-rows').innerHTML=`<div class="child-sku-row"><span class="plus-sep" style="opacity:0">+</span><input type="text" placeholder="e.g. NH-COND-002 (optional)" autocomplete="off" oninput="trackChange('childSKUs')"></div>`;
+  }
+
+  /* ══════════════ BULK UPLOAD ══════════════ */
+  const CSV_HEADERS = ['Platform_SKU_Code','Parent_NH_SKU','Child_Codes','GST','EAN','MRP','Platform_Name','Channel_SKU_Code','Shelf_Life','Status','Warehouses','Uploader','Barcode','Grand_Parent_Code'];
+
+  function downloadTemplate() {
+    const sampleRows = [
+      ['AMZ-FBA-001','NH-SHMP-001','','5%','1234567890123','299','Amazon','CH-AMZ-001','12 months','Active','GGN, BLR','Atul','',''],
+      ['FK-001-COMBO','NH-COND-001','NH-COND-001+NH-MASK-002','18%','9876543210123','499','Flipkart','CH-FK-001','6 months','Active','GGN, BLR, MUM','Kush','8901234567890','GP-COND-001'],
+    ];
+    // Build xlsx using SheetJS
+    const ws = XLSX.utils.aoa_to_sheet([CSV_HEADERS, ...sampleRows]);
+    // Set column widths
+    ws['!cols'] = CSV_HEADERS.map((h,i) => ({ wch: [20,20,28,8,16,8,18,22,18,14,22,14,16,20][i] || 16 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'SKU Upload');
+    XLSX.writeFile(wb, 'sku_bulk_upload_template.xlsx');
+    showToast('Excel template downloaded!','success');
+  }
+
+  function handleBulkFile(file) {
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['xlsx','xls','csv'].includes(ext)) {
+      showToast('Please upload an Excel (.xlsx / .xls) or CSV file','error'); return;
+    }
+    document.getElementById('preview-filename').textContent = file.name;
+    const reader = new FileReader();
+    if (ext === 'csv') {
+      reader.onload = e => parseBulkCSV(e.target.result);
+      reader.readAsText(file);
+    } else {
+      reader.onload = e => parseBulkExcel(e.target.result);
+      reader.readAsArrayBuffer(file);
+    }
+  }
+
+  function parseBulkExcel(arrayBuffer) {
+    try {
+      const wb    = XLSX.read(arrayBuffer, { type: 'array', cellText: true, cellDates: false });
+      const ws    = wb.Sheets[wb.SheetNames[0]];
+      // Convert to array-of-arrays, defval keeps empty cells as ''
+      const rows  = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+      if (rows.length < 2) { showToast('Excel sheet is empty or has no data rows','error'); return; }
+      processSheetRows(rows);
+    } catch(e) {
+      showToast('Could not read Excel file: ' + e.message, 'error');
+    }
+  }
+
+  function parseBulkCSV(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) { showToast('CSV is empty or has no data rows','error'); return; }
+    const rows = lines.map(l => parseCSVLine(l).map(v => v.trim()));
+    processSheetRows(rows);
+  }
+
+  function processSheetRows(rows) {
+    // rows[0] = header row
+    const header = rows[0].map(h => String(h).trim());
+    const colIdx = {};
+    CSV_HEADERS.forEach(h => { colIdx[h] = header.indexOf(h); });
+
+    // Optional columns — don't block on missing Barcode/Grand_Parent_Code
+    const REQUIRED_HEADERS = CSV_HEADERS.slice(0, 12); // first 12 are required
+    const missingCols = REQUIRED_HEADERS.filter(h => colIdx[h] === -1);
+    if (missingCols.length) {
+      showToast(`Missing columns: ${missingCols.join(', ')} — download the template.`, 'error');
+      return;
+    }
+
+    bulkRows = [];
+    for (let i = 1; i < rows.length; i++) {
+      const vals = rows[i];
+      const get  = col => colIdx[col] !== undefined && colIdx[col] !== -1 ? String(vals[colIdx[col]] || '').trim() : '';
+      const row  = {
+        _rowNum:         i,
+        platformSKU:     get('Platform_SKU_Code'),
+        parentSKU:       get('Parent_NH_SKU'),
+        childCodes:      get('Child_Codes'),
+        gst:             get('GST'),
+        ean:             get('EAN'),
+        mrp:             get('MRP'),
+        platformName:    get('Platform_Name'),
+        channelSKU:      get('Channel_SKU_Code'),
+        shelfLife:       get('Shelf_Life'),
+        status:          get('Status'),
+        warehouseMapping:get('Warehouses'),
+        uploaderName:    get('Uploader'),
+        barcode:         get('Barcode'),
+        grandParentCode: get('Grand_Parent_Code'),
+      };
+      // Skip fully empty rows
+      if (!row.platformSKU && !row.parentSKU && !row.ean && !row.mrp) continue;
+      row._errors  = validateBulkRow(row);
+      row._valid   = row._errors.length === 0;
+      bulkRows.push(row);
+    }
+
+    if (!bulkRows.length) { showToast('No data rows found in file','error'); return; }
+    checkBulkExisting();
+  }
+
+  async function checkBulkExisting() {
+    existingSKUs = new Set();
+    if (SCRIPT_URL) {
+      try {
+        const r = await gs({ action: 'fetch' });
+        if (r.success) {
+          (r.data||[]).forEach(row => existingSKUs.add(String(row.platformSKU).trim()));
+        }
+      } catch(e) {}
+    }
+    renderBulkPreview();
+  }
+
+  function validateBulkRow(row) {
+    const errs = [];
+    if (!row.platformSKU)         errs.push('Platform SKU missing');
+    if (!row.parentSKU)           errs.push('Parent NH SKU missing');
+    if (!VALID_GST.includes(row.gst)) errs.push(`GST invalid (got "${row.gst}") — use 5% or 18%`);
+    if (!row.ean)                 errs.push('EAN missing');
+    else if (!/^\d{13}$/.test(row.ean.trim())) errs.push('EAN must be exactly 13 digits, numbers only');
+    if (!row.mrp || isNaN(Number(row.mrp))) errs.push('MRP invalid');
+    if (!VALID_PLATFORMS.includes(row.platformName)) errs.push(`Platform invalid (got "${row.platformName}")`);
+    if (!row.channelSKU)          errs.push('Channel SKU missing');
+    if (!VALID_SHELF_LIFE.includes(row.shelfLife)) errs.push(`Shelf Life invalid (got "${row.shelfLife}") — use: 1.5 months, 2 months, 3 months, 6 months, 9 months, 12 months`);
+    if (!VALID_STATUS.includes(row.status)) errs.push(`Status invalid (got "${row.status}")`);
+    const whs = row.warehouseMapping.split(',').map(w=>w.trim()).filter(Boolean);
+    if (!whs.length || !whs.every(w=>VALID_WH.includes(w))) errs.push('Warehouses invalid (use GGN, BLR, MUM)');
+    if (!uploadersList.includes(row.uploaderName)) errs.push(`Uploader "${row.uploaderName}" not in approved list`);
+    return errs;
+  }
+
+  function renderBulkPreview() {
+    const tbody = document.getElementById('bulk-preview-body');
+    let newCount=0, updateCount=0, errCount=0;
+
+    tbody.innerHTML = bulkRows.map(row => {
+      const isExisting = existingSKUs.has(row.platformSKU);
+      let statusBadge, rowClass;
+      if (!row._valid) { errCount++; statusBadge='<span class="row-status-badge error">✕ Error</span>'; rowClass='bulk-row-err'; }
+      else if (isExisting) { updateCount++; statusBadge='<span class="row-status-badge update">↺ Update</span>'; rowClass='bulk-row-warn'; }
+      else { newCount++; statusBadge='<span class="row-status-badge new">+ New</span>'; rowClass='bulk-row-ok'; }
+
+      return `<tr class="${rowClass}">
+        <td class="td-mono">${row._rowNum}</td>
+        <td>${statusBadge}</td>
+        <td class="td-sku">${esc(row.platformSKU)||'<span style="color:var(--red)">—</span>'}</td>
+        <td><span class="pill-parent">${esc(row.parentSKU)||'—'}</span></td>
+        <td>${row.childCodes ? formatChildCodes(row.childCodes) : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td>${esc(row.platformName)}</td>
+        <td>${row.mrp?'₹'+esc(row.mrp):'—'}</td>
+        <td>${esc(row.gst)}</td>
+        <td class="td-mono">${esc(row.ean)}</td>
+        <td>${esc(row.shelfLife)}</td>
+        <td>${formatStatus(row.status)}</td>
+        <td>${row.warehouseMapping.split(',').map(w=>`<span class="wh-tag">${esc(w.trim())}</span>`).join('')}</td>
+        <td>${esc(row.uploaderName)}</td>
+        <td style="color:var(--red);font-size:11px;max-width:200px;white-space:normal">${row._errors.join('<br>')}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('bulk-stat-new').textContent    = newCount + ' new';
+    document.getElementById('bulk-stat-update').textContent = updateCount + ' update' + (updateCount!==1?'s':'');
+    document.getElementById('bulk-stat-error').textContent  = errCount + ' error' + (errCount!==1?'s':'');
+    document.getElementById('bulk-submit-btn').textContent  =
+      `Submit ${newCount+updateCount} Valid Row${newCount+updateCount!==1?'s':''}`;
+    document.getElementById('bulk-submit-btn').disabled = (newCount+updateCount) === 0;
+    document.getElementById('bulk-preview').style.display = 'block';
+  }
+
+  async function submitBulk() {
+    if (!SCRIPT_URL) { showToast('Apps Script URL not configured.','error'); return; }
+    const validRows = bulkRows.filter(r => r._valid);
+    if (!validRows.length) { showToast('No valid rows to submit','error'); return; }
+
+    const CHUNK_SIZE = 150; // safe limit per Apps Script execution (~30s)
+    const btn  = document.getElementById('bulk-submit-btn');
+    const wrap = document.getElementById('bulk-progress-wrap');
+    const bar  = document.getElementById('bulk-progress-bar');
+    const lbl  = document.getElementById('bulk-progress-label');
+    btn.disabled = true;
+    wrap.style.display = 'flex';
+
+    const rowPayloads = validRows.map(r => ({
+      platformSKU:      r.platformSKU,
+      parentSKU:        r.parentSKU,
+      childCodes:       r.childCodes.split('+').map(s=>s.trim()).filter(Boolean),
+      gst:              r.gst,
+      ean:              r.ean,
+      mrp:              r.mrp,
+      platformName:     r.platformName,
+      channelSKU:       r.channelSKU,
+      shelfLife:        r.shelfLife,
+      status:           r.status,
+      uploaderName:     r.uploaderName,
+      warehouseMapping: r.warehouseMapping.split(',').map(w=>w.trim()).filter(Boolean),
+      barcode:          r.barcode || '',
+      grandParentCode:  r.grandParentCode || ''
+    }));
+
+    // Chunk into batches
+    const chunks = [];
+    for (let i = 0; i < rowPayloads.length; i += CHUNK_SIZE)
+      chunks.push(rowPayloads.slice(i, i + CHUNK_SIZE));
+
+    let totalCreated = 0, totalUpdated = 0, totalFailed = 0;
+    const submitter = validRows[0]?.uploaderName || '';
+
+    for (let ci = 0; ci < chunks.length; ci++) {
+      const pct = Math.round(((ci) / chunks.length) * 90);
+      bar.style.width = pct + '%';
+      lbl.textContent = `Batch ${ci+1} of ${chunks.length} — ${Math.min((ci+1)*CHUNK_SIZE, rowPayloads.length)} / ${rowPayloads.length} rows…`;
+
+      try {
+        const result = await gs({
+          action: 'bulkSubmit',
+          submittedBy: submitter,
+          rows: chunks[ci]
+        });
+        if (result.success) {
+          totalCreated += result.results.filter(r=>r.type==='created').length;
+          totalUpdated += result.results.filter(r=>r.type==='updated').length;
+          totalFailed  += result.results.filter(r=>!r.success).length;
+        } else {
+          throw new Error(result.error || 'Unknown error on batch ' + (ci+1));
+        }
+      } catch(e) {
+        bar.style.background = 'var(--red)';
+        lbl.textContent = `Failed on batch ${ci+1}: ${e.message}`;
+        showToast(`Bulk upload failed on batch ${ci+1}: ${e.message}`, 'error');
+        btn.disabled = false;
+        return;
+      }
+    }
+
+    bar.style.width = '100%';
+    lbl.textContent = `Done — ${totalCreated} created, ${totalUpdated} updated${totalFailed?', '+totalFailed+' failed':''}`;
+    showToast(`Bulk upload complete: ${totalCreated} new, ${totalUpdated} updated.`, 'success');
+    if (totalUpdated > 0) bumpHistoryBadge();
+    setTimeout(clearBulk, 3500);
+  }
+
+  function clearBulk() {
+    bulkRows = [];
+    document.getElementById('bulk-preview').style.display = 'none';
+    document.getElementById('bulk-preview-body').innerHTML = '';
+    document.getElementById('bulk-progress-wrap').style.display = 'none';
+    document.getElementById('bulk-progress-bar').style.width = '0%';
+    document.getElementById('bulk-progress-label').textContent = '';
+    document.getElementById('bulk-submit-btn').disabled = false;
+    const fi = document.getElementById('bulk-file-input');
+    if (fi) fi.value = '';
+  }
+
+  function parseCSVLine(line) {
+    const result=[]; let cur='', inQuotes=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){if(inQuotes&&line[i+1]==='"'){cur+='"';i++;}else{inQuotes=!inQuotes;}}
+      else if(ch===','&&!inQuotes){result.push(cur);cur='';}
+      else{cur+=ch;}
+    }
+    result.push(cur);
+    return result;
+  }
+
+  /* ══════════════ FETCH LISTINGS ══════════════ */
+  async function fetchListings() {
+    const tbody=document.getElementById('listings-body');
+    const icon=document.getElementById('refresh-icon');
+    tbody.innerHTML='<tr class="loading-row"><td colspan="16">Loading…</td></tr>';
+    icon.style.animation='blink .6s linear infinite';
+    if(!SCRIPT_URL){tbody.innerHTML='<tr class="loading-row"><td colspan="16">Not configured.</td></tr>';icon.style.animation='';return;}
+    try {
+      const r=await gs({ action: 'fetch' });
+      icon.style.animation='';
+      if(!r.success)throw new Error(r.error);
+      allListingsData=r.data||[];
+      document.getElementById('listings-count').textContent=allListingsData.length+' entr'+(allListingsData.length===1?'y':'ies');
+      renderListings(allListingsData);
+    } catch(e){icon.style.animation='';tbody.innerHTML=`<tr class="loading-row"><td colspan="16">Error: ${esc(e.message)}</td></tr>`;}
+  }
+
+  function applyListingFilters() {
+    const uploader=document.getElementById('filter-uploader').value;
+    const platform=document.getElementById('filter-platform').value;
+    const approval=document.getElementById('filter-approval').value;
+    const filtered=allListingsData.filter(r=>{
+      if(uploader&&r.uploaderName!==uploader)return false;
+      if(platform&&r.platformName!==platform)return false;
+      if(approval&&String(r.approval).trim()!==approval)return false;
+      return true;
+    });
+    const fc=document.getElementById('filter-count');
+    if(uploader||platform||approval){fc.style.display='inline';fc.textContent=filtered.length+' of '+allListingsData.length+' shown';}
+    else{fc.style.display='none';}
+    renderListings(filtered);
+  }
+
+  function clearListingFilters(){
+    document.getElementById('filter-uploader').selectedIndex=0;
+    document.getElementById('filter-platform').selectedIndex=0;
+    document.getElementById('filter-approval').selectedIndex=0;
+    document.getElementById('filter-count').style.display='none';
+    renderListings(allListingsData);
+  }
+
+  function renderListings(data){
+    const tbody=document.getElementById('listings-body');
+    if(!data.length){tbody.innerHTML=`<tr><td colspan="16"><div class="empty-state"><div class="empty-icon">📦</div><p>No listings match your filters.</p></div></td></tr>`;return;}
+    tbody.innerHTML=data.map(row=>`<tr>
+      <td class="td-sku">${esc(row.platformSKU)}</td>
+      <td><span class="pill-parent">${esc(row.parentSKU)}</span></td>
+      <td>${formatChildCodes(row.childCodes)}</td>
+      <td>${esc(row.platformName)}</td>
+      <td class="td-mono">${esc(row.channelSKU)}</td>
+      <td>₹${esc(row.mrp)}</td>
+      <td>${esc(row.gst)}</td>
+      <td class="td-mono">${esc(row.ean)}</td>
+      <td>${esc(row.shelfLife)}</td>
+      <td>${formatStatus(row.status)}</td>
+      <td>${formatWarehouses(row.warehouseMapping)}</td>
+      <td>${esc(row.uploaderName)}</td>
+      <td class="td-mono">${formatDate(row.timestamp)}</td>
+      <td>${formatVersion(row.version)}</td>
+      <td>${formatApproval(row.approval)}</td>
+      <td><button class="btn-edit" onclick="editSKU('${esc(row.platformSKU)}')">✏ Edit</button></td>
+    </tr>`).join('');
+  }
+
+  /* ══════════════ FETCH HISTORY ══════════════ */
+  async function fetchHistory(){
+    const tbody=document.getElementById('history-body');
+    const icon=document.getElementById('history-refresh-icon');
+    tbody.innerHTML='<tr class="loading-row"><td colspan="15">Loading…</td></tr>';
+    icon.style.animation='blink .6s linear infinite';
+    if(!SCRIPT_URL){tbody.innerHTML='<tr class="loading-row"><td colspan="15">Not configured.</td></tr>';icon.style.animation='';return;}
+    try{
+      const r=await gs({ action: 'fetchHistory' });
+      icon.style.animation='';
+      if(!r.success)throw new Error(r.error);
+      allHistoryData=(r.data||[]).slice().reverse();
+      document.getElementById('history-count').textContent=allHistoryData.length+' archived version'+(allHistoryData.length===1?'':'s');
+      const badge=document.getElementById('history-badge');
+      if(allHistoryData.length>0){badge.style.display='inline';badge.textContent=allHistoryData.length;}else{badge.style.display='none';}
+      renderHistory(allHistoryData);
+    }catch(e){icon.style.animation='';tbody.innerHTML=`<tr class="loading-row"><td colspan="15">Error: ${esc(e.message)}</td></tr>`;}
+  }
+
+  function applyHistoryFilters(){
+    const sku=document.getElementById('history-filter-sku').value.trim().toLowerCase();
+    const uploader=document.getElementById('history-filter-uploader').value;
+    const platform=document.getElementById('history-filter-platform').value;
+    renderHistory(allHistoryData.filter(r=>{
+      if(sku&&!String(r.platformSKU).toLowerCase().includes(sku))return false;
+      if(uploader&&r.uploaderName!==uploader)return false;
+      if(platform&&r.platformName!==platform)return false;
+      return true;
+    }));
+  }
+
+  function clearHistoryFilters(){
+    document.getElementById('history-filter-sku').value='';
+    document.getElementById('history-filter-uploader').selectedIndex=0;
+    document.getElementById('history-filter-platform').selectedIndex=0;
+    renderHistory(allHistoryData);
+  }
+
+  function renderHistory(data){
+    const tbody=document.getElementById('history-body');
+    if(!data.length){tbody.innerHTML=`<tr><td colspan="15"><div class="empty-state"><div class="empty-icon">🗂</div><p>No history yet.</p></div></td></tr>`;return;}
+    tbody.innerHTML=data.map(row=>`<tr>
+      <td class="td-sku">${esc(row.platformSKU)}</td>
+      <td>${formatVersion(row.version)}</td>
+      <td><span class="pill-parent">${esc(row.parentSKU)}</span></td>
+      <td>${formatChildCodes(row.childCodes)}</td>
+      <td>${esc(row.platformName)}</td>
+      <td>₹${esc(row.mrp)}</td>
+      <td>${esc(row.gst)}</td>
+      <td class="td-mono">${esc(row.ean)}</td>
+      <td>${formatStatus(row.status)}</td>
+      <td>${formatWarehouses(row.warehouseMapping)}</td>
+      <td>${formatApproval(row.approval)}</td>
+      <td>${esc(row.uploaderName)}</td>
+      <td class="td-mono">${formatDate(row.originalTimestamp)}</td>
+      <td class="td-mono">${formatDate(row.archivedAt)}</td>
+      <td>${formatChangedFields(row.changedFields)}</td>
+    </tr>`).join('');
+  }
+
+  /* ══════════════ FORMATTERS ══════════════ */
+  function esc(v){if(v===null||v===undefined)return'—';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function formatChildCodes(v){if(!v||!v.toString().trim())return'<span style="color:var(--text-dim);font-size:11px">—</span>';return v.toString().split('+').map((s,i)=>(i>0?`<span class="pill-sep">+</span>`:'')+`<span class="pill-child">${esc(s.trim())}</span>`).join('');}
+  function formatWarehouses(v){if(!v)return'—';return v.split(',').map(w=>`<span class="wh-tag">${esc(w.trim())}</span>`).join('');}
+  function formatDate(v){if(!v)return'—';try{return new Date(v).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'});}catch{return String(v);}}
+  function formatApproval(v){const val=(v||'Pending').toString().trim();const low=val.toLowerCase();const cls=low==='approved'?'approval-approved':low==='rejected'?'approval-rejected':'approval-pending';return`<span class="approval-badge ${cls}"><span class="badge-dot"></span>${esc(val)}</span>`;}
+  function formatStatus(v){if(!v)return'—';const c={Active:'color:var(--green)',Inactive:'color:var(--text-muted)',Upcoming:'color:var(--amber)',Discontinued:'color:var(--red)'};return`<span style="${c[v]||''};font-size:12px">${esc(v)}</span>`;}
+  function formatVersion(v){return`<span class="version-badge">v${esc(v||1)}</span>`;}
+  function formatChangedFields(v){if(!v)return'<span style="color:var(--text-dim);font-size:11px">—</span>';return v.split(',').map(f=>f.trim()).filter(Boolean).map(f=>`<span class="changed-chip">${esc(f)}</span>`).join('');}
+
+  /* ══════════════ TOAST ══════════════ */
+  function showToast(msg,type){const t=document.getElementById('toast');document.getElementById('toast-icon').textContent=type==='success'?'✓':type==='info'?'ℹ':type==='warn'?'⚠':'✕';document.getElementById('toast-msg').textContent=msg;t.className='toast '+type+' show';setTimeout(()=>{t.className='toast';},5000);}
+  function copyScript(){navigator.clipboard.writeText(document.getElementById('script-box').textContent).then(()=>showToast('Script copied!','success'));}
+</script>
+</body>
+</html>
