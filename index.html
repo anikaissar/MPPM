@@ -331,7 +331,7 @@
       <div class="form-grid">
         <div class="field" id="field-ean">
           <label>EAN Code</label>
-          <input type="text" id="ean" placeholder="13-digit barcode" maxlength="13" autocomplete="off" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'');trackChange('ean')">
+          <input type="text" id="ean" placeholder="up to 30 chars, alphanumeric" maxlength="30" autocomplete="off" oninput="trackChange('ean')">
         </div>
         <div class="field" id="field-mrp">
           <label>MRP (₹)</label>
@@ -417,7 +417,7 @@
             <span style="color:var(--green)">B</span> <span style="color:var(--text-muted)">Parent_NH_SKU</span><br>
             <span style="color:var(--green)">C</span> <span style="color:var(--text-muted)">Child_Codes <span style="color:var(--text-dim)">(use + separator)</span></span><br>
             <span style="color:var(--green)">D</span> <span style="color:var(--text-muted)">GST <span style="color:var(--text-dim)">(5% or 18%)</span></span><br>
-            <span style="color:var(--green)">E</span> <span style="color:var(--text-muted)">EAN <span style="color:var(--text-dim)">(13 digits, numbers only)</span></span>
+            <span style="color:var(--green)">E</span> <span style="color:var(--text-muted)">EAN <span style="color:var(--text-dim)">(up to 30 chars, alphanumeric)</span></span>
           </div>
           <div style="font-size:12px;line-height:2">
             <span style="color:var(--green)">F</span> <span style="color:var(--text-muted)">MRP</span><br>
@@ -820,7 +820,7 @@ function fetchHistory() {
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-content">
-          <strong>Deploy:</strong> <code>Deploy → New Deployment</code> → Type: <code>Web App</code> → Execute as: <code>Me</code> → Access: <code>Anyone in your org</code>. Copy the URL.
+          <strong>Deploy:</strong> <code>Deploy → New Deployment</code> → Type: <code>Web App</code> → Execute as: <code>Me</code> → Access: <code>Anyone</code> <span style="color:var(--red);font-size:11px">(⚠ must be "Anyone", NOT "Anyone in your org" — otherwise browser requests fail)</span>. Copy the URL. Then open the deployment URL directly in your browser once to authorize it.
         </div>
       </div>
 
@@ -862,26 +862,51 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1C7KGREi9nL0RC_g-A0dnbltXeaXpk483imHwXzjzW4r0dOUAlYvBHi8ARivmRo2T/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylkOTSAZvVhDXMP1OVwzsv7sBx35MXiBVR3PxgPPM8bKls0ce4O7pRgGBbV6dawBs5/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
-  /* ── unified fetch helper — sends as text/plain to avoid CORS preflight ── */
-  async function gs(params) {
+  /* ── unified fetch helper with retry + clear error messages ── */
+  async function gs(params, retries = 2) {
     const isWrite = params.action === 'submit' || params.action === 'bulkSubmit';
-    if (isWrite) {
-      // POST with text/plain — no preflight triggered
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'text/plain' }
-      });
-      return res.json();
-    } else {
-      // GET with query params
-      const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-      const res = await fetch(`${SCRIPT_URL}?${qs}`);
-      return res.json();
+    let lastErr;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        let res;
+        if (isWrite) {
+          res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(params),
+            headers: { 'Content-Type': 'text/plain' }
+          });
+        } else {
+          const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+          res = await fetch(`${SCRIPT_URL}?${qs}`);
+        }
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} — ${res.statusText || 'server error'}. Check your Apps Script deployment.`);
+        }
+        const text = await res.text();
+        try {
+          return JSON.parse(text);
+        } catch(e) {
+          const snippet = text.slice(0, 200).replace(/<[^>]+>/g, ' ').trim();
+          throw new Error(`Script returned non-JSON: "${snippet}". Redeploy and reauthorize.`);
+        }
+      } catch(e) {
+        lastErr = e;
+        const msg = e.message || '';
+        if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed') || msg.includes('fetch')) {
+          lastErr = new Error(
+            'Network error — cannot reach Apps Script. Check: ' +
+            '(1) Deployment access is "Anyone" (not "Anyone in your org"), ' +
+            '(2) SCRIPT_URL in this file is correct and not empty, ' +
+            '(3) Open the script URL directly in your browser to authorize it first.'
+          );
+        }
+        if (attempt < retries) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+      }
     }
+    throw lastErr;
   }
 
   // Valid options for bulk validation
@@ -1050,7 +1075,7 @@ function fetchHistory() {
     if (!document.getElementById('gst').value)                return 'Please select a GST rate';
     const ean=document.getElementById('ean').value.trim();
     if (!ean)              return 'EAN Code is required';
-    if (!/^\d{13}$/.test(ean)) return 'EAN must be exactly 13 digits (numbers only)';
+    if (!/^[A-Za-z0-9]{1,30}$/.test(ean)) return 'EAN must be 1–30 alphanumeric characters';
     if (!document.getElementById('mrp').value)                return 'MRP is required';
     if (!document.getElementById('platformName').value)        return 'Platform Name is required';
     if (!document.getElementById('channelSKU').value.trim())  return 'Channel SKU Code is required';
@@ -1220,7 +1245,7 @@ function fetchHistory() {
     if (!row.parentSKU)           errs.push('Parent NH SKU missing');
     if (!VALID_GST.includes(row.gst)) errs.push(`GST invalid (got "${row.gst}") — use 5% or 18%`);
     if (!row.ean)                 errs.push('EAN missing');
-    else if (!/^\d{13}$/.test(row.ean.trim())) errs.push('EAN must be exactly 13 digits, numbers only');
+    else if (!/^[A-Za-z0-9]{1,30}$/.test(row.ean.trim())) errs.push('EAN must be 1–30 alphanumeric characters (no spaces or special chars)');
     if (!row.mrp || isNaN(Number(row.mrp))) errs.push('MRP invalid');
     if (!VALID_PLATFORMS.includes(row.platformName)) errs.push(`Platform invalid (got "${row.platformName}")`);
     if (!row.channelSKU)          errs.push('Channel SKU missing');
