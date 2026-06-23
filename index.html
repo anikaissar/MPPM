@@ -265,7 +265,7 @@
           <label>Platform Name</label>
           <select id="platformName" onchange="trackChange('platformName')">
             <option value="">Select platform…</option>
-            <option>Amazon</option><option>Nykaa</option><option>Flipkart</option>
+            <option>Rk World</option><option>Nykaa</option><option>Flipkart</option>
             <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
             <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
             <option>First Cry</option><option>Cred</option><option>Purplle</option>
@@ -490,7 +490,7 @@
       </select>
       <select class="filter-select" id="filter-platform" onchange="applyListingFilters()">
         <option value="">All platforms</option>
-        <option>Amazon</option><option>Nykaa</option><option>Flipkart</option>
+        <option>Rk World</option><option>Nykaa</option><option>Flipkart</option>
         <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
         <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
         <option>First Cry</option><option>Cred</option><option>Purplle</option>
@@ -537,7 +537,7 @@
       </select>
       <select class="filter-select" id="history-filter-platform" onchange="applyHistoryFilters()">
         <option value="">All platforms</option>
-        <option>Amazon</option><option>Nykaa</option><option>Flipkart</option>
+        <option>Rk World</option><option>Nykaa</option><option>Flipkart</option>
         <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
         <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
         <option>First Cry</option><option>Cred</option><option>Purplle</option>
@@ -862,7 +862,7 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylkOTSAZvVhDXMP1OVwzsv7sBx35MXiBVR3PxgPPM8bKls0ce4O7pRgGBbV6dawBs5/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI79-tehnTonI_axVpvvpxXmCHmEGnQVVYvD-UAjg5PNTqHtV3Z6lBw2mWIwA_WSxi/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
   /* ── unified fetch helper with retry + clear error messages ── */
@@ -912,7 +912,7 @@ function fetchHistory() {
   // Valid options for bulk validation
   const VALID_GST        = ["5%","18%"];
   const VALID_SHELF_LIFE = ["1.5 months","2 months","3 months","6 months","9 months","12 months"];
-  const VALID_PLATFORMS = ["Amazon","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jiomart","Amala Earth","Tata 1 Mg","Pharmeasy","Snapdeal","POP Club","Kind Life","First Club","Shopsy","Flipkart Minutes"];
+  const VALID_PLATFORMS = ["Rk World","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jiomart","Amala Earth","Tata 1 Mg","Pharmeasy","Snapdeal","POP Club","Kind Life","First Club","Shopsy","Flipkart Minutes"];
   const VALID_STATUS    = ["Active","Inactive","Upcoming","Discontinued"];
   const VALID_WH        = ["GGN","BLR","MUM"];
 
@@ -1130,7 +1130,7 @@ function fetchHistory() {
 
   function downloadTemplate() {
     const sampleRows = [
-      ['AMZ-FBA-001','NH-SHMP-001','','5%','1234567890123','299','Amazon','CH-AMZ-001','12 months','Active','GGN, BLR','Atul','',''],
+      ['AMZ-FBA-001','NH-SHMP-001','','5%','1234567890123','299','Rk World','CH-AMZ-001','12 months','Active','GGN, BLR','Atul','',''],
       ['FK-001-COMBO','NH-COND-001','NH-COND-001+NH-MASK-002','18%','9876543210123','499','Flipkart','CH-FK-001','6 months','Active','GGN, BLR, MUM','Kush','8901234567890','GP-COND-001'],
     ];
     // Build xlsx using SheetJS
