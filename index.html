@@ -267,6 +267,7 @@
             <option value="">Select platform…</option>
             <option>Rk World</option><option>Nykaa</option><option>Flipkart</option>
             <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
+            <option>Peeko</option><option>OZI</option>
             <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
             <option>First Cry</option><option>Cred</option><option>Purplle</option>
             <option>Tata Cliq</option><option>Jiomart</option><option>Amala Earth</option>
@@ -338,22 +339,22 @@
           <input type="number" id="mrp" placeholder="e.g. 299" min="0" step="0.01" oninput="trackChange('mrp')">
         </div>
         <div class="field" id="field-gst">
-          <label>GST (%)</label>
+          <label>GST</label>
           <select id="gst" onchange="trackChange('gst')">
             <option value="">Select GST rate…</option>
-            <option>5%</option><option>18%</option>
+            <option>0.05</option><option>0.18</option>
           </select>
         </div>
         <div class="field" id="field-shelfLife">
           <label>Shelf Life</label>
           <select id="shelfLife" onchange="trackChange('shelfLife')">
             <option value="">Select shelf life…</option>
-            <option>1.5 months</option>
-            <option>2 months</option>
-            <option>3 months</option>
-            <option>6 months</option>
-            <option>9 months</option>
-            <option>12 months</option>
+            <option value="45">45 days</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+            <option value="180">180 days</option>
+            <option value="270">270 days</option>
+            <option value="360">360 days</option>
           </select>
         </div>
       </div>
@@ -416,14 +417,14 @@
             <span style="color:var(--green)">A</span> <span style="color:var(--text-muted)">Platform_SKU_Code</span><br>
             <span style="color:var(--green)">B</span> <span style="color:var(--text-muted)">Parent_NH_SKU</span><br>
             <span style="color:var(--green)">C</span> <span style="color:var(--text-muted)">Child_Codes <span style="color:var(--text-dim)">(use + separator)</span></span><br>
-            <span style="color:var(--green)">D</span> <span style="color:var(--text-muted)">GST <span style="color:var(--text-dim)">(5% or 18%)</span></span><br>
+            <span style="color:var(--green)">D</span> <span style="color:var(--text-muted)">GST <span style="color:var(--text-dim)">(0.05 or 0.18)</span></span><br>
             <span style="color:var(--green)">E</span> <span style="color:var(--text-muted)">EAN <span style="color:var(--text-dim)">(up to 30 chars, alphanumeric)</span></span>
           </div>
           <div style="font-size:12px;line-height:2">
             <span style="color:var(--green)">F</span> <span style="color:var(--text-muted)">MRP</span><br>
             <span style="color:var(--green)">G</span> <span style="color:var(--text-muted)">Platform_Name</span><br>
             <span style="color:var(--green)">H</span> <span style="color:var(--text-muted)">Channel_SKU_Code</span><br>
-            <span style="color:var(--green)">I</span> <span style="color:var(--text-muted)">Shelf_Life <span style="color:var(--text-dim)">(1.5 months / 2 months / 3 months / 6 months / 9 months / 12 months)</span></span><br>
+            <span style="color:var(--green)">I</span> <span style="color:var(--text-muted)">Shelf_Life <span style="color:var(--text-dim)">(numeric days only: 45 / 60 / 90 / 180 / 270 / 360)</span></span><br>
             <span style="color:var(--green)">J</span> <span style="color:var(--text-muted)">Status <span style="color:var(--text-dim)">(Active / Inactive / Upcoming / Discontinued)</span></span>
           </div>
           <div style="font-size:12px;line-height:2">
@@ -492,6 +493,7 @@
         <option value="">All platforms</option>
         <option>Rk World</option><option>Nykaa</option><option>Flipkart</option>
         <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
+        <option>Peeko</option><option>OZI</option>
         <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
         <option>First Cry</option><option>Cred</option><option>Purplle</option>
         <option>Tata Cliq</option><option>Jiomart</option><option>Amala Earth</option>
@@ -539,6 +541,7 @@
         <option value="">All platforms</option>
         <option>Rk World</option><option>Nykaa</option><option>Flipkart</option>
         <option>Myntra</option><option>Meesho</option><option>Blinkit</option>
+        <option>Peeko</option><option>OZI</option>
         <option>Zepto</option><option>Instamart</option><option>Big Basket</option>
         <option>First Cry</option><option>Cred</option><option>Purplle</option>
         <option>Tata Cliq</option><option>Jiomart</option><option>Amala Earth</option>
@@ -572,8 +575,8 @@
         <div class="step-num">1</div>
         <div class="step-content">
           <strong>Create four sheet tabs:</strong><br>
-          • <code>SKU Listings</code> — 18 cols: <code>Timestamp | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | Warehouses | Approval | Row ID | Version | Barcode | Grand Parent Code</code><br>
-          • <code>SKU History</code> — 20 cols: <code>Archived At | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | Warehouses | Approval | Row ID | Version | Original Timestamp | Changed Fields | Barcode | Grand Parent Code</code><br>
+          • <code>SKU Listings</code> — 20 cols: <code>Timestamp | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | WH_GGN | WH_BLR | WH_MUM | Approval | Row ID | Version | Barcode | Grand Parent Code</code><br>
+          • <code>SKU History</code> — 22 cols: <code>Archived At | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | WH_GGN | WH_BLR | WH_MUM | Approval | Row ID | Version | Original Timestamp | Changed Fields | Barcode | Grand Parent Code</code><br>
           • <code>Uploaders</code> — 1 col: <code>Name</code> in A1, then one name per row from A2. Pre-filled with your 10 names. Add more anytime — they appear in the portal on next load.<br>
           • <code>Bulk Upload Log</code> — optional, for tracking bulk job history (script auto-creates entries).<br><br>
           <strong>Uploaders tab — initial data (paste into A1:A11):</strong><br>
@@ -591,16 +594,18 @@ const HIST_SHEET    = "SKU History";
 const UPLDR_SHEET   = "Uploaders";
 const BULKLOG_SHEET = "Bulk Upload Log";
 
-// SKU Listings headers (18 cols)
+// SKU Listings headers (20 cols) — Warehouses split into 3 binary columns
 const MAIN_HEADERS = [
   "Timestamp","Platform SKU","Parent NH SKU","Child Codes","GST","EAN","MRP",
-  "Platform Name","Channel SKU","Shelf Life","Status","Uploader","Warehouses",
+  "Platform Name","Channel SKU","Shelf Life","Status","Uploader",
+  "WH_GGN","WH_BLR","WH_MUM",
   "Approval","Row ID","Version","Barcode","Grand Parent Code"
 ];
-// SKU History headers (20 cols)
+// SKU History headers (22 cols)
 const HIST_HEADERS = [
   "Archived At","Platform SKU","Parent NH SKU","Child Codes","GST","EAN","MRP",
-  "Platform Name","Channel SKU","Shelf Life","Status","Uploader","Warehouses",
+  "Platform Name","Channel SKU","Shelf Life","Status","Uploader",
+  "WH_GGN","WH_BLR","WH_MUM",
   "Approval","Row ID","Version","Original Timestamp","Changed Fields",
   "Barcode","Grand Parent Code"
 ];
@@ -655,12 +660,29 @@ function getUploaders() {
   return { success: true, uploaders: names };
 }
 
+/* ── warehouse helpers — convert between array ["GGN","MUM"] and 3 binary flags ── */
+function whArrayToFlags(arr) {
+  const list = Array.isArray(arr) ? arr : String(arr || "").split(",").map(s=>s.trim()).filter(Boolean);
+  return [
+    list.includes("GGN") ? 1 : 0,
+    list.includes("BLR") ? 1 : 0,
+    list.includes("MUM") ? 1 : 0
+  ];
+}
+function whFlagsToArray(ggn, blr, mum) {
+  const out = [];
+  if (Number(ggn) === 1) out.push("GGN");
+  if (Number(blr) === 1) out.push("BLR");
+  if (Number(mum) === 1) out.push("MUM");
+  return out;
+}
+
 /* ── check if platform SKU exists ── */
 function checkSKU(platformSKU) {
   const rows = getSheet(MAIN_SHEET).getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][1]).trim() === String(platformSKU).trim()) {
-      return { success: true, exists: true, version: rows[i][15] || 1, current: rowToObj(rows[i]) };
+      return { success: true, exists: true, version: rows[i][17] || 1, current: rowToObj(rows[i]) };
     }
   }
   return { success: true, exists: false };
@@ -670,9 +692,10 @@ function rowToObj(r) {
   return {
     timestamp: r[0], platformSKU: r[1], parentSKU: r[2], childCodes: r[3],
     gst: r[4], ean: r[5], mrp: r[6], platformName: r[7], channelSKU: r[8],
-    shelfLife: r[9], status: r[10], uploaderName: r[11], warehouseMapping: r[12],
-    approval: r[13], rowId: r[14], version: r[15] || 1,
-    barcode: r[16] || "", grandParentCode: r[17] || ""
+    shelfLife: r[9], status: r[10], uploaderName: r[11],
+    warehouseMapping: whFlagsToArray(r[12], r[13], r[14]),
+    approval: r[15], rowId: r[16], version: r[17] || 1,
+    barcode: r[18] || "", grandParentCode: r[19] || ""
   };
 }
 
@@ -681,7 +704,7 @@ function rowToObj(r) {
 function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
   const now      = new Date().toISOString();
   const childStr = Array.isArray(data.childCodes) ? data.childCodes.join("+") : (data.childCodes || "");
-  const wh       = Array.isArray(data.warehouseMapping) ? data.warehouseMapping.join(", ") : (data.warehouseMapping || "");
+  const [ggn, blr, mum] = whArrayToFlags(data.warehouseMapping);
   const barcode  = data.barcode || "";
   const gpc      = data.grandParentCode || "";
 
@@ -696,7 +719,7 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
 
   if (idx !== -1) {
     const old        = rows[idx];
-    const oldVersion = Number(old[15]) || 1;
+    const oldVersion = Number(old[17]) || 1;
     const fieldMap   = {
       "Parent NH SKU":    [old[2],  data.parentSKU],
       "Child Codes":      [old[3],  childStr],
@@ -708,9 +731,11 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
       "Shelf Life":       [old[9],  data.shelfLife],
       "Status":           [old[10], data.status],
       "Uploader":         [old[11], data.uploaderName],
-      "Warehouses":       [old[12], wh],
-      "Barcode":          [old[16] || "", barcode],
-      "Grand Parent Code":[old[17] || "", gpc]
+      "WH_GGN":           [old[12], ggn],
+      "WH_BLR":           [old[13], blr],
+      "WH_MUM":           [old[14], mum],
+      "Barcode":          [old[18] || "", barcode],
+      "Grand Parent Code":[old[19] || "", gpc]
     };
     const changed = Object.entries(fieldMap)
       .filter(([,[o,n]]) => String(o).trim() !== String(n).trim())
@@ -718,19 +743,19 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
 
     histSheet.appendRow([
       now, old[1], old[2], old[3], old[4], old[5], old[6],
-      old[7], old[8], old[9], old[10], old[11], old[12],
-      old[13], old[14], oldVersion, old[0], changed.join(", "),
-      old[16] || "", old[17] || ""
+      old[7], old[8], old[9], old[10], old[11], old[12], old[13], old[14],
+      old[15], old[16], oldVersion, old[0], changed.join(", "),
+      old[18] || "", old[19] || ""
     ]);
 
     const newRow = [
       now, data.platformSKU, data.parentSKU, childStr,
       data.gst, data.ean, data.mrp, data.platformName,
       data.channelSKU, data.shelfLife, data.status,
-      data.uploaderName, wh, "Pending", old[14], oldVersion + 1,
+      data.uploaderName, ggn, blr, mum, "Pending", old[16], oldVersion + 1,
       barcode, gpc
     ];
-    mainSheet.getRange(idx + 1, 1, 1, 18).setValues([newRow]);
+    mainSheet.getRange(idx + 1, 1, 1, 20).setValues([newRow]);
     // Keep cache in sync
     if (_cachedRows) rows[idx] = newRow;
     return { success: true, type: "updated", version: oldVersion + 1, changedFields: changed };
@@ -741,7 +766,7 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
     now, data.platformSKU, data.parentSKU, childStr,
     data.gst, data.ean, data.mrp, data.platformName,
     data.channelSKU, data.shelfLife, data.status,
-    data.uploaderName, wh, "Pending", rowId, 1,
+    data.uploaderName, ggn, blr, mum, "Pending", rowId, 1,
     barcode, gpc
   ];
   mainSheet.appendRow(newRow);
@@ -807,10 +832,11 @@ function fetchHistory() {
     data: rows.slice(1).map(r => ({
       archivedAt: r[0], platformSKU: r[1], parentSKU: r[2], childCodes: r[3],
       gst: r[4], ean: r[5], mrp: r[6], platformName: r[7], channelSKU: r[8],
-      shelfLife: r[9], status: r[10], uploaderName: r[11], warehouseMapping: r[12],
-      approval: r[13], rowId: r[14], version: r[15] || 1,
-      originalTimestamp: r[16], changedFields: r[17],
-      barcode: r[18] || "", grandParentCode: r[19] || ""
+      shelfLife: r[9], status: r[10], uploaderName: r[11],
+      warehouseMapping: whFlagsToArray(r[12], r[13], r[14]),
+      approval: r[15], rowId: r[16], version: r[17] || 1,
+      originalTimestamp: r[18], changedFields: r[19],
+      barcode: r[20] || "", grandParentCode: r[21] || ""
     }))
   };
 }</div>
@@ -862,7 +888,7 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI79-tehnTonI_axVpvvpxXmCHmEGnQVVYvD-UAjg5PNTqHtV3Z6lBw2mWIwA_WSxi/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNyaEk1AnaojmCX_u0DDf1cxpHoxopiJhUmRi7Jo-SIjSl9VDr6njvvlYYfaNIWfPg/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
   /* ── unified fetch helper with retry + clear error messages ── */
@@ -910,9 +936,9 @@ function fetchHistory() {
   }
 
   // Valid options for bulk validation
-  const VALID_GST        = ["5%","18%"];
-  const VALID_SHELF_LIFE = ["1.5 months","2 months","3 months","6 months","9 months","12 months"];
-  const VALID_PLATFORMS = ["Rk World","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jiomart","Amala Earth","Tata 1 Mg","Pharmeasy","Snapdeal","POP Club","Kind Life","First Club","Shopsy","Flipkart Minutes"];
+  const VALID_GST        = ["0.05","0.18"];
+  const VALID_SHELF_LIFE = ["45","60","90","180","270","360"];
+  const VALID_PLATFORMS = ["Rk World","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Peeko","OZI","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jiomart","Amala Earth","Tata 1 Mg","Pharmeasy","Snapdeal","POP Club","Kind Life","First Club","Shopsy","Flipkart Minutes"];
   const VALID_STATUS    = ["Active","Inactive","Upcoming","Discontinued"];
   const VALID_WH        = ["GGN","BLR","MUM"];
 
@@ -1051,7 +1077,7 @@ function fetchHistory() {
       const b=document.getElementById('field-nhSKUs');
       if(b){cur!==orig?b.classList.add('field-changed'):b.classList.remove('field-changed')}
       return;
-    } else if (fieldId==='warehouseMapping') { cur=getWarehouses().join(', '); orig=(existingRecord.warehouseMapping||'').trim(); }
+    } else if (fieldId==='warehouseMapping') { cur=getWarehouses().join(', '); const ewm=existingRecord.warehouseMapping; orig=(Array.isArray(ewm)?ewm.join(', '):String(ewm||'')).trim(); }
     else { const el=document.getElementById(fieldId); if(el)cur=el.value; const m={platformName:'platformName',channelSKU:'channelSKU',status:'status',ean:'ean',mrp:'mrp',gst:'gst',shelfLife:'shelfLife',uploaderName:'uploaderName',barcode:'barcode',grandParentCode:'grandParentCode'}; if(m[fieldId])orig=String(existingRecord[m[fieldId]]||'').trim(); }
     cur.trim()!==orig?fe.classList.add('field-changed'):fe.classList.remove('field-changed');
   }
@@ -1130,8 +1156,8 @@ function fetchHistory() {
 
   function downloadTemplate() {
     const sampleRows = [
-      ['AMZ-FBA-001','NH-SHMP-001','','5%','1234567890123','299','Rk World','CH-AMZ-001','12 months','Active','GGN, BLR','Atul','',''],
-      ['FK-001-COMBO','NH-COND-001','NH-COND-001+NH-MASK-002','18%','9876543210123','499','Flipkart','CH-FK-001','6 months','Active','GGN, BLR, MUM','Kush','8901234567890','GP-COND-001'],
+      ['AMZ-FBA-001','NH-SHMP-001','','0.05','1234567890123','299','Rk World','CH-AMZ-001','360','Active','GGN, BLR','Atul','',''],
+      ['FK-001-COMBO','NH-COND-001','NH-COND-001+NH-MASK-002','0.18','9876543210123','499','Flipkart','CH-FK-001','180','Active','GGN, BLR, MUM','Kush','8901234567890','GP-COND-001'],
     ];
     // Build xlsx using SheetJS
     const ws = XLSX.utils.aoa_to_sheet([CSV_HEADERS, ...sampleRows]);
@@ -1243,13 +1269,13 @@ function fetchHistory() {
     const errs = [];
     if (!row.platformSKU)         errs.push('Platform SKU missing');
     if (!row.parentSKU)           errs.push('Parent NH SKU missing');
-    if (!VALID_GST.includes(row.gst)) errs.push(`GST invalid (got "${row.gst}") — use 5% or 18%`);
+    if (!VALID_GST.includes(String(row.gst).trim())) errs.push(`GST invalid (got "${row.gst}") — use 0.05 or 0.18`);
     if (!row.ean)                 errs.push('EAN missing');
     else if (!/^[A-Za-z0-9]{1,30}$/.test(row.ean.trim())) errs.push('EAN must be 1–30 alphanumeric characters (no spaces or special chars)');
     if (!row.mrp || isNaN(Number(row.mrp))) errs.push('MRP invalid');
     if (!VALID_PLATFORMS.includes(row.platformName)) errs.push(`Platform invalid (got "${row.platformName}")`);
     if (!row.channelSKU)          errs.push('Channel SKU missing');
-    if (!VALID_SHELF_LIFE.includes(row.shelfLife)) errs.push(`Shelf Life invalid (got "${row.shelfLife}") — use: 1.5 months, 2 months, 3 months, 6 months, 9 months, 12 months`);
+    if (!VALID_SHELF_LIFE.includes(String(row.shelfLife).trim())) errs.push(`Shelf Life invalid (got "${row.shelfLife}") — use numeric days only: 45, 60, 90, 180, 270, 360`);
     if (!VALID_STATUS.includes(row.status)) errs.push(`Status invalid (got "${row.status}")`);
     const whs = row.warehouseMapping.split(',').map(w=>w.trim()).filter(Boolean);
     if (!whs.length || !whs.every(w=>VALID_WH.includes(w))) errs.push('Warehouses invalid (use GGN, BLR, MUM)');
@@ -1518,7 +1544,7 @@ function fetchHistory() {
   /* ══════════════ FORMATTERS ══════════════ */
   function esc(v){if(v===null||v===undefined)return'—';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function formatChildCodes(v){if(!v||!v.toString().trim())return'<span style="color:var(--text-dim);font-size:11px">—</span>';return v.toString().split('+').map((s,i)=>(i>0?`<span class="pill-sep">+</span>`:'')+`<span class="pill-child">${esc(s.trim())}</span>`).join('');}
-  function formatWarehouses(v){if(!v)return'—';return v.split(',').map(w=>`<span class="wh-tag">${esc(w.trim())}</span>`).join('');}
+  function formatWarehouses(v){if(!v||!v.length)return'—';const arr=Array.isArray(v)?v:String(v).split(',').map(w=>w.trim()).filter(Boolean);if(!arr.length)return'—';return arr.map(w=>`<span class="wh-tag">${esc(w.trim())}</span>`).join('');}
   function formatDate(v){if(!v)return'—';try{return new Date(v).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'});}catch{return String(v);}}
   function formatApproval(v){const val=(v||'Pending').toString().trim();const low=val.toLowerCase();const cls=low==='approved'?'approval-approved':low==='rejected'?'approval-rejected':'approval-pending';return`<span class="approval-badge ${cls}"><span class="badge-dot"></span>${esc(val)}</span>`;}
   function formatStatus(v){if(!v)return'—';const c={Active:'color:var(--green)',Inactive:'color:var(--text-muted)',Upcoming:'color:var(--amber)',Discontinued:'color:var(--red)'};return`<span style="${c[v]||''};font-size:12px">${esc(v)}</span>`;}
