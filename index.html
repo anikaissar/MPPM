@@ -624,8 +624,15 @@ function doGet(e)  { return handleRequest(e); }
 function doPost(e) { return handleRequest(e); }
 
 function handleRequest(e) {
-  const body   = e.postData ? JSON.parse(e.postData.contents) : {};
-  const action = e.parameter.action || body.action;
+  let body = {};
+  try {
+    if (e.postData && e.postData.contents) {
+      body = JSON.parse(e.postData.contents);
+    }
+  } catch (parseErr) {
+    return cors({ success: false, error: "Failed to parse request body: " + parseErr.toString() + " | raw length: " + (e.postData ? e.postData.contents.length : 0) });
+  }
+  const action = (e.parameter && e.parameter.action) || body.action;
   try {
     if (action === "getUploaders") return cors(getUploaders());
     if (action === "check")        return cors(checkSKU(e.parameter.platformSKU || body.platformSKU));
@@ -633,7 +640,7 @@ function handleRequest(e) {
     if (action === "fetchHistory") return cors(fetchHistory());
     if (action === "submit")       return cors(upsertSKU(body, getSheet(MAIN_SHEET), getSheet(HIST_SHEET)));
     if (action === "bulkSubmit")   return cors(bulkSubmit(body));
-    return cors({ success: false, error: "Unknown action: " + action });
+    return cors({ success: false, error: "Unknown action: " + action + " | rowCount: " + (body.rows ? body.rows.length : "n/a") });
   } catch(err) {
     return cors({ success: false, error: err.toString() });
   }
@@ -888,7 +895,7 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNyaEk1AnaojmCX_u0DDf1cxpHoxopiJhUmRi7Jo-SIjSl9VDr6njvvlYYfaNIWfPg/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9dUUrZ0bTokJaT6CmNOS5ye4HI1nEHJg_s28IgCed8hFjkQklqlRWTa24lceU9pF-/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
   /* ── unified fetch helper with retry + clear error messages ── */
@@ -1358,32 +1365,50 @@ function fetchHistory() {
 
     let totalCreated = 0, totalUpdated = 0, totalFailed = 0;
     const submitter = validRows[0]?.uploaderName || '';
+    const BATCH_RETRY_LIMIT = 3;
+    const BATCH_GAP_MS = 400; // small pause between batches — avoids overloading Apps Script
 
     for (let ci = 0; ci < chunks.length; ci++) {
       const pct = Math.round(((ci) / chunks.length) * 90);
       bar.style.width = pct + '%';
-      lbl.textContent = `Batch ${ci+1} of ${chunks.length} — ${Math.min((ci+1)*CHUNK_SIZE, rowPayloads.length)} / ${rowPayloads.length} rows…`;
 
-      try {
-        const result = await gs({
-          action: 'bulkSubmit',
-          submittedBy: submitter,
-          rows: chunks[ci]
-        });
-        if (result.success) {
-          totalCreated += result.results.filter(r=>r.type==='created').length;
-          totalUpdated += result.results.filter(r=>r.type==='updated').length;
-          totalFailed  += result.results.filter(r=>!r.success).length;
-        } else {
-          throw new Error(result.error || 'Unknown error on batch ' + (ci+1));
+      let batchSucceeded = false, lastBatchErr = null;
+      for (let attempt = 1; attempt <= BATCH_RETRY_LIMIT; attempt++) {
+        lbl.textContent = attempt === 1
+          ? `Batch ${ci+1} of ${chunks.length} — ${Math.min((ci+1)*CHUNK_SIZE, rowPayloads.length)} / ${rowPayloads.length} rows…`
+          : `Batch ${ci+1} of ${chunks.length} — retry ${attempt-1}/${BATCH_RETRY_LIMIT-1}…`;
+        try {
+          const result = await gs({
+            action: 'bulkSubmit',
+            submittedBy: submitter,
+            rows: chunks[ci]
+          }, 0); // gs() has its own internal retry; we manage retry here at the batch level instead
+          if (result.success) {
+            totalCreated += result.results.filter(r=>r.type==='created').length;
+            totalUpdated += result.results.filter(r=>r.type==='updated').length;
+            totalFailed  += result.results.filter(r=>!r.success).length;
+            batchSucceeded = true;
+            break;
+          } else {
+            lastBatchErr = new Error(result.error || 'Unknown error on batch ' + (ci+1));
+          }
+        } catch(e) {
+          lastBatchErr = e;
         }
-      } catch(e) {
+        if (attempt < BATCH_RETRY_LIMIT) await new Promise(r => setTimeout(r, 800 * attempt));
+      }
+
+      if (!batchSucceeded) {
         bar.style.background = 'var(--red)';
-        lbl.textContent = `Failed on batch ${ci+1}: ${e.message}`;
-        showToast(`Bulk upload failed on batch ${ci+1}: ${e.message}`, 'error');
+        const rowsLeft = rowPayloads.length - (ci * CHUNK_SIZE);
+        lbl.textContent = `Failed on batch ${ci+1} after ${BATCH_RETRY_LIMIT} attempts: ${lastBatchErr?.message || 'unknown error'}`;
+        showToast(`Bulk upload stopped at batch ${ci+1} (${totalCreated+totalUpdated} rows already saved, ${rowsLeft} rows not yet submitted). Re-upload the same file to resume — already-saved SKUs will be skipped/updated safely.`, 'error');
         btn.disabled = false;
         return;
       }
+
+      // brief pause before next batch to avoid overwhelming Apps Script
+      if (ci < chunks.length - 1) await new Promise(r => setTimeout(r, BATCH_GAP_MS));
     }
 
     bar.style.width = '100%';
