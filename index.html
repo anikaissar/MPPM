@@ -274,7 +274,7 @@
             <option>Tata 1mg</option><option>Pharmeasy</option><option>SnapDeal</option>
             <option>Pop Club</option><option>Kindlife</option><option>First Club</option>
             <option>Maccaron</option>
-            <option>Shopsy</option><option>Flipkart Minutes</option>
+            <option>Shopsy</option><option>Flipkart Minutes</option><option>D2C</option>
           </select>
         </div>
         <div class="field" id="field-channelSKU">
@@ -501,7 +501,7 @@
         <option>Tata 1mg</option><option>Pharmeasy</option><option>SnapDeal</option>
         <option>Pop Club</option><option>Kindlife</option><option>First Club</option>
         <option>Maccaron</option>
-        <option>Shopsy</option><option>Flipkart Minutes</option>
+        <option>Shopsy</option><option>Flipkart Minutes</option><option>D2C</option>
       </select>
       <select class="filter-select" id="filter-approval" onchange="applyListingFilters()">
         <option value="">All approvals</option>
@@ -550,7 +550,7 @@
         <option>Tata 1mg</option><option>Pharmeasy</option><option>SnapDeal</option>
         <option>Pop Club</option><option>Kindlife</option><option>First Club</option>
         <option>Maccaron</option>
-        <option>Shopsy</option><option>Flipkart Minutes</option>
+        <option>Shopsy</option><option>Flipkart Minutes</option><option>D2C</option>
       </select>
       <button class="filter-clear" onclick="clearHistoryFilters()">✕ Clear</button>
     </div>
@@ -583,7 +583,7 @@
           • <code>Uploaders</code> — 1 col: <code>Name</code> in A1, then one name per row from A2. Pre-filled with your 10 names. Add more anytime — they appear in the portal on next load.<br>
           • <code>Bulk Upload Log</code> — optional, for tracking bulk job history (script auto-creates entries).<br><br>
           <strong>Uploaders tab — initial data (paste into A1:A11):</strong><br>
-          <code>Name</code><br><code>Atul</code><br><code>Kush</code><br><code>Harsh</code><br><code>Manav</code><br><code>Garima</code><br><code>Aditya</code><br><code>Mayank</code><br><code>Anika</code><br><code>Daksh</code><br><code>Shtaakshi</code>
+          <code>Name</code><br><code>Atul</code><br><code>Kush</code><br><code>Harsh</code><br><code>Manav</code><br><code>Garima</code><br><code>Aditya</code><br><code>Mayank</code><br><code>Anika</code><br><code>Daksh</code><br><code>Shtaakshi</code><br><code>Atul Jangra</code>
         </div>
       </div>
 
@@ -898,7 +898,7 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBQchuB07wEBze7BS5TvIFRCJwoOUEbKQTsEuqPmac7ug4voVJadEUAYZXeldiJn4Q/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuzk1qO-X9GIHWvzhI57oljIoNgA9uINStvH90xyCsIj2rVZj3cRxHUCMVzFiKJevS/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
   /* ── unified fetch helper with retry + clear error messages ── */
@@ -948,7 +948,7 @@ function fetchHistory() {
   // Valid options for bulk validation
   const VALID_GST        = ["0.05","0.18"];
   const VALID_SHELF_LIFE = ["45","60","90","180","270","360"];
-  const VALID_PLATFORMS = ["Rk World","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Peeko","OZI","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jio Mart","Amala Earth","Tata 1mg","Pharmeasy","SnapDeal","Pop Club","Kindlife","First Club","Maccaron","Shopsy","Flipkart Minutes"];
+  const VALID_PLATFORMS = ["Rk World","Nykaa","Flipkart","Myntra","Meesho","Blinkit","Peeko","OZI","Zepto","Instamart","Big Basket","First Cry","Cred","Purplle","Tata Cliq","Jio Mart","Amala Earth","Tata 1mg","Pharmeasy","SnapDeal","Pop Club","Kindlife","First Club","Maccaron","Shopsy","Flipkart Minutes","D2C"];
   const VALID_STATUS    = ["Active","Inactive","Upcoming","Discontinued"];
   const VALID_WH        = ["GGN","BLR","MUM"];
 
@@ -974,7 +974,7 @@ function fetchHistory() {
       }
     } catch(e) {
       // fallback to hardcoded list if sheet unreachable
-      const fallback = ["Atul","Kush","Harsh","Manav","Garima","Aditya","Mayank","Anika","Daksh","Shtaakshi"];
+      const fallback = ["Atul","Kush","Harsh","Manav","Garima","Aditya","Mayank","Anika","Daksh","Shtaakshi","Atul Jangra"];
       uploadersList = fallback;
       populateUploaderDropdowns(fallback);
     }
