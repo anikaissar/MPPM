@@ -372,6 +372,19 @@
             <div class="wh-option"><input type="checkbox" id="wh-mum" value="MUM" onchange="trackChange('warehouseMapping')"><label for="wh-mum"><span class="wh-dot"></span>MUM — Mumbai</label></div>
           </div>
         </div>
+        <div class="field" id="field-fcStatus">
+          <label>FC Status</label>
+          <div class="wh-group">
+            <div class="wh-option">
+              <input type="radio" id="fc-yes" name="fcStatus" value="1" onchange="trackChange('fcStatus')">
+              <label for="fc-yes"><span class="wh-dot"></span>1 — Send to FC</label>
+            </div>
+            <div class="wh-option">
+              <input type="radio" id="fc-no" name="fcStatus" value="0" onchange="trackChange('fcStatus')">
+              <label for="fc-no"><span class="wh-dot"></span>0 — Do not send</label>
+            </div>
+          </div>
+        </div>
         <div class="field" id="field-uploaderName" style="max-width:320px">
           <label>Uploader</label>
           <select id="uploaderName" onchange="trackChange('uploaderName')">
@@ -432,7 +445,8 @@
             <span style="color:var(--green)">K</span> <span style="color:var(--text-muted)">Warehouses <span style="color:var(--text-dim)">(GGN, BLR, MUM — comma separated)</span></span><br>
             <span style="color:var(--green)">L</span> <span style="color:var(--text-muted)">Uploader <span style="color:var(--text-dim)">(exact name from list)</span></span><br>
             <span style="color:var(--green)">M</span> <span style="color:var(--text-muted)">Barcode <span style="color:var(--text-dim)">(optional)</span></span><br>
-            <span style="color:var(--green)">N</span> <span style="color:var(--text-muted)">Grand_Parent_Code <span style="color:var(--text-dim)">(optional)</span></span>
+            <span style="color:var(--green)">N</span> <span style="color:var(--text-muted)">Grand_Parent_Code <span style="color:var(--text-dim)">(optional)</span></span><br>
+            <span style="color:var(--green)">O</span> <span style="color:var(--text-muted)">FC_Status <span style="color:var(--text-dim)">(1 = send to FC, 0 = do not send)</span></span>
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);line-height:1.8">
@@ -460,7 +474,7 @@
             <tr>
               <th>#</th><th>Status</th><th>Platform SKU</th><th>Parent NH SKU</th><th>Child Codes</th>
               <th>Platform</th><th>MRP</th><th>GST</th><th>EAN</th><th>Shelf Life</th>
-              <th>Prod Status</th><th>Warehouses</th><th>Uploader</th><th>Issue</th>
+              <th>Prod Status</th><th>Warehouses</th><th>Uploader</th><th>FC</th><th>Issue</th>
             </tr>
           </thead>
           <tbody id="bulk-preview-body"></tbody>
@@ -578,8 +592,8 @@
         <div class="step-num">1</div>
         <div class="step-content">
           <strong>Create four sheet tabs:</strong><br>
-          • <code>SKU Listings</code> — 20 cols: <code>Timestamp | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | WH_GGN | WH_BLR | WH_MUM | Approval | Row ID | Version | Barcode | Grand Parent Code</code><br>
-          • <code>SKU History</code> — 22 cols: <code>Archived At | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | WH_GGN | WH_BLR | WH_MUM | Approval | Row ID | Version | Original Timestamp | Changed Fields | Barcode | Grand Parent Code</code><br>
+          • <code>SKU Listings</code> — 21 cols: <code>Timestamp | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | WH_GGN | WH_BLR | WH_MUM | Approval | Row ID | Version | Barcode | Grand Parent Code | FC_Status</code><br>
+          • <code>SKU History</code> — 23 cols: <code>Archived At | Platform SKU | Parent NH SKU | Child Codes | GST | EAN | MRP | Platform Name | Channel SKU | Shelf Life | Status | Uploader | WH_GGN | WH_BLR | WH_MUM | Approval | Row ID | Version | Original Timestamp | Changed Fields | Barcode | Grand Parent Code | FC_Status</code><br>
           • <code>Uploaders</code> — 1 col: <code>Name</code> in A1, then one name per row from A2. Pre-filled with your 10 names. Add more anytime — they appear in the portal on next load.<br>
           • <code>Bulk Upload Log</code> — optional, for tracking bulk job history (script auto-creates entries).<br><br>
           <strong>Uploaders tab — initial data (paste into A1:A11):</strong><br>
@@ -602,7 +616,7 @@ const MAIN_HEADERS = [
   "Timestamp","Platform SKU","Parent NH SKU","Child Codes","GST","EAN","MRP",
   "Platform Name","Channel SKU","Shelf Life","Status","Uploader",
   "WH_GGN","WH_BLR","WH_MUM",
-  "Approval","Row ID","Version","Barcode","Grand Parent Code"
+  "Approval","Row ID","Version","Barcode","Grand Parent Code","","FC_Status"
 ];
 // SKU History headers (22 cols)
 const HIST_HEADERS = [
@@ -610,7 +624,7 @@ const HIST_HEADERS = [
   "Platform Name","Channel SKU","Shelf Life","Status","Uploader",
   "WH_GGN","WH_BLR","WH_MUM",
   "Approval","Row ID","Version","Original Timestamp","Changed Fields",
-  "Barcode","Grand Parent Code"
+  "Barcode","Grand Parent Code","","FC_Status"
 ];
 
 /* ── CORS-safe response ── */
@@ -705,7 +719,7 @@ function rowToObj(r) {
     shelfLife: r[9], status: r[10], uploaderName: r[11],
     warehouseMapping: whFlagsToArray(r[12], r[13], r[14]),
     approval: r[15], rowId: r[16], version: r[17] || 1,
-    barcode: r[18] || "", grandParentCode: r[19] || ""
+    barcode: r[18] || "", grandParentCode: r[19] || "", fcStatus: Number(r[21]) || 0
   };
 }
 
@@ -717,6 +731,7 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
   const [ggn, blr, mum] = whArrayToFlags(data.warehouseMapping);
   const barcode  = data.barcode || "";
   const gpc      = data.grandParentCode || "";
+  const fcs      = (data.fcStatus !== undefined && data.fcStatus !== "") ? Number(data.fcStatus) : 0;
 
   // Use cached rows in bulk mode, otherwise read from sheet
   const rows  = _cachedRows || mainSheet.getDataRange().getValues();
@@ -745,7 +760,8 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
       "WH_BLR":           [old[13], blr],
       "WH_MUM":           [old[14], mum],
       "Barcode":          [old[18] || "", barcode],
-      "Grand Parent Code":[old[19] || "", gpc]
+      "Grand Parent Code":[old[19] || "", gpc],
+      "FC_Status":        [Number(old[21]) || 0, fcs]
     };
     const changed = Object.entries(fieldMap)
       .filter(([,[o,n]]) => String(o).trim() !== String(n).trim())
@@ -755,7 +771,7 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
       now, old[1], old[2], old[3], old[4], old[5], old[6],
       old[7], old[8], old[9], old[10], old[11], old[12], old[13], old[14],
       old[15], old[16], oldVersion, old[0], changed.join(", "),
-      old[18] || "", old[19] || ""
+      old[18] || "", old[19] || "", "", Number(old[21]) || 0
     ]);
 
     const newRow = [
@@ -763,9 +779,9 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
       data.gst, data.ean, data.mrp, data.platformName,
       data.channelSKU, data.shelfLife, data.status,
       data.uploaderName, ggn, blr, mum, "Pending", old[16], oldVersion + 1,
-      barcode, gpc
+      barcode, gpc, "", fcs
     ];
-    mainSheet.getRange(idx + 1, 1, 1, 20).setValues([newRow]);
+    mainSheet.getRange(idx + 1, 1, 1, 22).setValues([newRow]);
     // Keep cache in sync
     if (_cachedRows) rows[idx] = newRow;
     return { success: true, type: "updated", version: oldVersion + 1, changedFields: changed };
@@ -777,7 +793,7 @@ function upsertSKU(data, mainSheet, histSheet, _cachedRows, _rowIndex) {
     data.gst, data.ean, data.mrp, data.platformName,
     data.channelSKU, data.shelfLife, data.status,
     data.uploaderName, ggn, blr, mum, "Pending", rowId, 1,
-    barcode, gpc
+    barcode, gpc, "", fcs
   ];
   mainSheet.appendRow(newRow);
   // Keep cache in sync for later rows in the same batch
@@ -846,7 +862,7 @@ function fetchHistory() {
       warehouseMapping: whFlagsToArray(r[12], r[13], r[14]),
       approval: r[15], rowId: r[16], version: r[17] || 1,
       originalTimestamp: r[18], changedFields: r[19],
-      barcode: r[20] || "", grandParentCode: r[21] || ""
+      barcode: r[20] || "", grandParentCode: r[21] || "", fcStatus: Number(r[23]) || 0
     }))
   };
 }</div>
@@ -898,7 +914,7 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuzk1qO-X9GIHWvzhI57oljIoNgA9uINStvH90xyCsIj2rVZj3cRxHUCMVzFiKJevS/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6CVFPrGGJqLjCaYmLSF8qEOobS4CxwcG0kr2JLKaKfR6p0RcQ2b0I11erewOR9bY/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
   /* ── unified fetch helper with retry + clear error messages ── */
@@ -1060,8 +1076,10 @@ function fetchHistory() {
       cc.innerHTML = `<div class="child-sku-row"><span class="plus-sep" style="opacity:0">+</span><input type="text" placeholder="e.g. NH-COND-002 (optional)" autocomplete="off" oninput="trackChange('childSKUs')"></div>`;
     }
     ['GGN','BLR','MUM'].forEach(w => {
-      document.getElementById('wh-'+w.toLowerCase()).checked = (r.warehouseMapping||'').includes(w);
+      document.getElementById('wh-'+w.toLowerCase()).checked = (Array.isArray(r.warehouseMapping)?r.warehouseMapping:String(r.warehouseMapping||'')).includes(w);
     });
+    const fcEl=document.querySelector(`input[name="fcStatus"][value="${Number(r.fcStatus)||0}"]`);
+    if(fcEl)fcEl.checked=true;
     document.querySelectorAll('.field-changed').forEach(f=>f.classList.remove('field-changed'));
   }
 
@@ -1088,7 +1106,7 @@ function fetchHistory() {
       if(b){cur!==orig?b.classList.add('field-changed'):b.classList.remove('field-changed')}
       return;
     } else if (fieldId==='warehouseMapping') { cur=getWarehouses().join(', '); const ewm=existingRecord.warehouseMapping; orig=(Array.isArray(ewm)?ewm.join(', '):String(ewm||'')).trim(); }
-    else { const el=document.getElementById(fieldId); if(el)cur=el.value; const m={platformName:'platformName',channelSKU:'channelSKU',status:'status',ean:'ean',mrp:'mrp',gst:'gst',shelfLife:'shelfLife',uploaderName:'uploaderName',barcode:'barcode',grandParentCode:'grandParentCode'}; if(m[fieldId])orig=String(existingRecord[m[fieldId]]||'').trim(); }
+    else { const el=document.getElementById(fieldId); if(el)cur=el.value; const m={platformName:'platformName',channelSKU:'channelSKU',status:'status',ean:'ean',mrp:'mrp',gst:'gst',shelfLife:'shelfLife',uploaderName:'uploaderName',barcode:'barcode',grandParentCode:'grandParentCode',fcStatus:'fcStatus'}; if(m[fieldId])orig=String(existingRecord[m[fieldId]]||'').trim(); }
     cur.trim()!==orig?fe.classList.add('field-changed'):fe.classList.remove('field-changed');
   }
 
@@ -1103,6 +1121,7 @@ function fetchHistory() {
   function removeChildRow(btn){const c=document.getElementById('child-sku-rows');if(c.querySelectorAll('.child-sku-row').length>1){btn.closest('.child-sku-row').remove();trackChange('childSKUs');}}
   function getChildSKUs(){return Array.from(document.querySelectorAll('#child-sku-rows .child-sku-row input')).map(i=>i.value.trim()).filter(Boolean);}
   function getWarehouses(){return['GGN','BLR','MUM'].filter(w=>document.getElementById('wh-'+w.toLowerCase()).checked);}
+  function getFcStatus(){const el=document.querySelector('input[name="fcStatus"]:checked');return el?Number(el.value):null;}
 
   /* ── validation ── */
   function validate() {
@@ -1117,6 +1136,7 @@ function fetchHistory() {
     if (!document.getElementById('channelSKU').value.trim())  return 'Channel SKU Code is required';
     if (!document.getElementById('shelfLife').value)    return 'Please select a Shelf Life';
     if (!document.getElementById('status').value)             return 'Status is required';
+    if (getFcStatus()===null)                                return 'Please select an FC Status (1 or 0)';
     if (!getWarehouses().length)                              return 'Select at least one Warehouse';
     if (!document.getElementById('uploaderName').value)       return 'Please select your name';
     return null;
@@ -1127,7 +1147,7 @@ function fetchHistory() {
     const err=validate();
     if(err){showToast(err,'error');return;}
     if(!SCRIPT_URL){showToast('Apps Script URL not configured.','error');return;}
-    const payload={action:'submit',platformSKU:document.getElementById('platformSKU').value.trim(),parentSKU:document.getElementById('parentSKU').value.trim(),childCodes:getChildSKUs(),gst:document.getElementById('gst').value,ean:document.getElementById('ean').value.trim(),mrp:document.getElementById('mrp').value,platformName:document.getElementById('platformName').value,channelSKU:document.getElementById('channelSKU').value.trim(),shelfLife:document.getElementById('shelfLife').value.trim(),status:document.getElementById('status').value,uploaderName:document.getElementById('uploaderName').value,warehouseMapping:getWarehouses(),barcode:document.getElementById('barcode').value.trim(),grandParentCode:document.getElementById('grandParentCode').value.trim()};
+    const payload={action:'submit',platformSKU:document.getElementById('platformSKU').value.trim(),parentSKU:document.getElementById('parentSKU').value.trim(),childCodes:getChildSKUs(),gst:document.getElementById('gst').value,ean:document.getElementById('ean').value.trim(),mrp:document.getElementById('mrp').value,platformName:document.getElementById('platformName').value,channelSKU:document.getElementById('channelSKU').value.trim(),shelfLife:document.getElementById('shelfLife').value.trim(),status:document.getElementById('status').value,uploaderName:document.getElementById('uploaderName').value,warehouseMapping:getWarehouses(),fcStatus:getFcStatus(),barcode:document.getElementById('barcode').value.trim(),grandParentCode:document.getElementById('grandParentCode').value.trim()};
     const btn=document.getElementById('submit-btn');
     btn.disabled=true;btn.textContent=isUpdateMode?'Updating…':'Submitting…';
     try {
@@ -1158,11 +1178,12 @@ function fetchHistory() {
     ['platformSKU','ean','mrp','channelSKU','parentSKU','barcode','grandParentCode'].forEach(id=>{document.getElementById(id).value='';});
     ['gst','platformName','status','uploaderName','shelfLife'].forEach(id=>{document.getElementById(id).selectedIndex=0;});
     ['wh-ggn','wh-blr','wh-mum'].forEach(id=>{document.getElementById(id).checked=false;});
+    document.querySelectorAll('input[name="fcStatus"]').forEach(r=>{r.checked=false;});
     document.getElementById('child-sku-rows').innerHTML=`<div class="child-sku-row"><span class="plus-sep" style="opacity:0">+</span><input type="text" placeholder="e.g. NH-COND-002 (optional)" autocomplete="off" oninput="trackChange('childSKUs')"></div>`;
   }
 
   /* ══════════════ BULK UPLOAD ══════════════ */
-  const CSV_HEADERS = ['Platform_SKU_Code','Parent_NH_SKU','Child_Codes','GST','EAN','MRP','Platform_Name','Channel_SKU_Code','Shelf_Life','Status','Warehouses','Uploader','Barcode','Grand_Parent_Code'];
+  const CSV_HEADERS = ['Platform_SKU_Code','Parent_NH_SKU','Child_Codes','GST','EAN','MRP','Platform_Name','Channel_SKU_Code','Shelf_Life','Status','Warehouses','Uploader','Barcode','Grand_Parent_Code','FC_Status'];
 
   function downloadTemplate() {
     const sampleRows = [
@@ -1250,6 +1271,7 @@ function fetchHistory() {
         uploaderName:    get('Uploader'),
         barcode:         get('Barcode'),
         grandParentCode: get('Grand_Parent_Code'),
+        fcStatus:        get('FC_Status'),
       };
       // Skip fully empty rows
       if (!row.platformSKU && !row.parentSKU && !row.ean && !row.mrp) continue;
@@ -1290,6 +1312,7 @@ function fetchHistory() {
     const whs = row.warehouseMapping.split(',').map(w=>w.trim()).filter(Boolean);
     if (!whs.length || !whs.every(w=>VALID_WH.includes(w))) errs.push('Warehouses invalid (use GGN, BLR, MUM)');
     if (!uploadersList.includes(row.uploaderName)) errs.push(`Uploader "${row.uploaderName}" not in approved list`);
+    if (row.fcStatus !== '' && !['0','1'].includes(String(row.fcStatus).trim())) errs.push(`FC Status invalid (got "${row.fcStatus}") — use 1 or 0`);
     return errs;
   }
 
@@ -1318,6 +1341,7 @@ function fetchHistory() {
         <td>${formatStatus(row.status)}</td>
         <td>${row.warehouseMapping.split(',').map(w=>`<span class="wh-tag">${esc(w.trim())}</span>`).join('')}</td>
         <td>${esc(row.uploaderName)}</td>
+        <td style="color:${row.fcStatus==='1'?'var(--green)':'var(--text-muted)'}">${row.fcStatus===''?'—':row.fcStatus}</td>
         <td style="color:var(--red);font-size:11px;max-width:200px;white-space:normal">${row._errors.join('<br>')}</td>
       </tr>`;
     }).join('');
@@ -1358,7 +1382,8 @@ function fetchHistory() {
       uploaderName:     r.uploaderName,
       warehouseMapping: r.warehouseMapping.split(',').map(w=>w.trim()).filter(Boolean),
       barcode:          r.barcode || '',
-      grandParentCode:  r.grandParentCode || ''
+      grandParentCode:  r.grandParentCode || '',
+      fcStatus:         r.fcStatus !== '' ? Number(r.fcStatus) : 0
     }));
 
     // Chunk into batches
