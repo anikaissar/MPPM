@@ -941,7 +941,7 @@ function fetchHistory() {
 
 <script>
   // ─── CONFIG ───────────────────────────────────────────────────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiQ6FvdQkO4490h7MH22VhoPgok5w3GqVGhVfp11JNxAJk5Ol9Q1PT8Opw2N_HTO3U/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypJAbRJEFt__u7yZ7kv-tSInhOZs0u04caMduxTuvolDvuSLIBV5qYX0Qwz7rFNbVF/exec";
   // ─────────────────────────────────────────────────────────────────────────
 
   /* ── unified fetch helper with retry + clear error messages ── */
@@ -974,7 +974,8 @@ function fetchHistory() {
       } catch(e) {
         lastErr = e;
         const msg = e.message || '';
-        if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed') || msg.includes('fetch')) {
+        const isNetworkErr = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed') || msg.includes('fetch');
+        if (isNetworkErr) {
           lastErr = new Error(
             'Network error — cannot reach Apps Script. Check: ' +
             '(1) Deployment access is "Anyone" (not "Anyone in your org"), ' +
@@ -982,7 +983,9 @@ function fetchHistory() {
             '(3) Open the script URL directly in your browser to authorize it first.'
           );
         }
-        if (attempt < retries) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        // Only retry on genuine network errors, never on successful HTTP responses
+        if (attempt < retries && isNetworkErr) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        else if (!isNetworkErr) break; // got a response (even error JSON) — don't retry
       }
     }
     throw lastErr;
@@ -1182,7 +1185,7 @@ function fetchHistory() {
     const btn=document.getElementById('submit-btn');
     btn.disabled=true;btn.textContent=isUpdateMode?'Updating…':'Submitting…';
     try {
-      const r=await gs(payload);
+      const r=await gs(payload, 0); // no retries — single submit is not idempotent
       if(r.success){
         if(r.type==='updated'){const f=r.changedFields&&r.changedFields.length?` Changed: ${r.changedFields.join(', ')}.`:'';showToast(`Updated to v${r.version}.${f} Old version archived.`,'info');bumpHistoryBadge();}
         else{showToast('New SKU created successfully!','success');}
